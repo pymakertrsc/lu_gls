@@ -10,12 +10,12 @@ set(CMAKE_CXX_STANDARD 17)
 #设置头文件
 set(HEADERS
 
-)
+ "src/Application.h" "src/Window.h" "src/WindowsWindow.h")
 
 set(SOURCES
 	"src/Main.cpp"
 	"src/Application.cpp"
-)
+ "src/Window.cpp")
 
 
 set(TARGET LuGls)
