@@ -87,7 +87,7 @@ BOOL Application::createWindow(HINSTANCE hInstance)
 
 	mHwnd = CreateWindowW(
 		mWindowClassName,
-		(LPCWSTR)"GraphicLearning",	//窗体标题
+		(LPCWSTR)"LuGraphicLearning",	//窗体标题
 		dwStyle,
 		500,//x位置，相对左上角
 		500,//y位置，相对左上角
