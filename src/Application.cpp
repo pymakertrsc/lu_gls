@@ -1,4 +1,5 @@
 #include"Application.h"
+#include"Window.h"
 #include<string>
 #include<memory>
 
@@ -18,12 +19,14 @@ namespace RGS {
 		Terminate();
 	}
 
-	void Application::Init() {
-
+	void Application::Init() 
+	{
+		Window::Init();
 	}
 
-	void Application::Terminate() {
-
+	void Application::Terminate() 
+	{
+		Window::Terminate();
 	}
 
 	void Application::Run() {
