@@ -57,9 +57,9 @@ namespace RGS {
         rect.bottom = (long)height;
         rect.right = (long)width;
         AdjustWindowRect(&rect, style, false);
-        m_Handle = CreateWindow(RGS_WINDOW_CLASS_NAME, m_Title.c_str, style,
-            CW_USEDEFAULT, 0, rect.right - rect.left, rect.bottom - rect.top,
-            NULL, NULL, GetModuleHandle(NULL), NULL);
+        //m_Handle = CreateWindow(RGS_WINDOW_CLASS_NAME, m_Title.c_str, style,
+          //  CW_USEDEFAULT, 0, rect.right - rect.left, rect.bottom - rect.top,
+         //   NULL, NULL, GetModuleHandle(NULL), NULL);
         ASSERT(m_Handle != nullptr);
         m_Closed = false;
         //m_Minimized = false;

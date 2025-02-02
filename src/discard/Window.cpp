@@ -15,12 +15,12 @@ namespace RGS {
 
 	Window* Window::Create(const std::string title, const int width, const int height) 
 	{
-#ifdef RGS_PLATFORM_WINDOWS
+//ifdef RGS_PLATFORM_WINDOWS
 		return new WindowsWindow(title, width, height);
-#endif // RGS_PLATFORM_WINDOWS
-#ifdef RGS_PLATFORM_MAC
-		return new MacWindow(title, width, height);
-#endif
+//#endif // RGS_PLATFORM_WINDOWS
+//#ifdef RGS_PLATFORM_MAC
+		//return new MacWindow(title, width, height);
+//#endif
 		
 	}
 
