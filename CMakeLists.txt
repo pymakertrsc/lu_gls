@@ -8,9 +8,10 @@ project(Graphic)
 set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(application)
+add_subdirectory(gpu)
 
 #本工程所有cpp文件编译链接，生成exe
 add_executable(softRenderer "main.cpp")
 
-target_link_libraries(softRenderer applicationLib)
+target_link_libraries(softRenderer applicationLib gpuLib)
 

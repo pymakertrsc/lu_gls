@@ -10,14 +10,20 @@ public:
 	Application();
 	~Application();
 
-	//×¢²á´°ÌåÀà£¬´´½¨Ò»¸ö´°Ìå£¬ÏÔÊ¾
+	//æ³¨å†Œçª—ä½“ç±»ï¼Œåˆ›å»ºä¸€ä¸ªçª—ä½“ï¼Œæ˜¾ç¤º
 	bool initApplication(HINSTANCE hInstance, const uint32_t& width = 800, const uint32_t& height = 600);
 
-	//ÍĞ¹ÜÁËwndProc²¶»ñµÄÏûÏ¢£¬²¢ÇÒ½øĞĞ´¦Àí
+	//æ‰˜ç®¡äº†wndProcæ•è·çš„æ¶ˆæ¯ï¼Œå¹¶ä¸”è¿›è¡Œå¤„ç†
 	void handleMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	//Ã¿Ò»Ö¡/Ã¿Ò»´ÎÑ­»·£¬¶¼»áµ÷ÓÃ£¬²¶»ñÒÔ¼°·Ö·¢´°ÌåÏûÏ¢
+	//æ¯ä¸€å¸§/æ¯ä¸€æ¬¡å¾ªç¯ï¼Œéƒ½ä¼šè°ƒç”¨ï¼Œæ•è·ä»¥åŠåˆ†å‘çª—ä½“æ¶ˆæ¯
 	bool peekMessage();
+
+	void show();
+
+	uint32_t getWidth() const { return mWidth; }
+	uint32_t getHeight() const { return mHeight; }
+	void* getCanvas() const { return mCanvasBuffer; }
 
 private:
 	BOOL createWindow(HINSTANCE hInstance);
@@ -26,8 +32,8 @@ private:
 private:
 	static Application* mInstance;
 
-	//Îªtrue±íÊ¾µ±Ç°´°ÌåÈÔÈ»ÔÚ¼ÌĞøÏÔÊ¾£¬³ÌĞòÒ»Ö±ÔÚÅÜ
-	//Îªfalse±íÊ¾´°ÌåÒÑ¾­±»ÃüÁî¹Ø±Õ£¬³ÌĞòĞèÒªÍË³ö
+	//ä¸ºtrueè¡¨ç¤ºå½“å‰çª—ä½“ä»ç„¶åœ¨ç»§ç»­æ˜¾ç¤ºï¼Œç¨‹åºä¸€ç›´åœ¨è·‘
+	//ä¸ºfalseè¡¨ç¤ºçª—ä½“å·²ç»è¢«å‘½ä»¤å…³é—­ï¼Œç¨‹åºéœ€è¦é€€å‡º
 	bool		mAlive{ true };
 
 	HINSTANCE	mWindowInst;
@@ -36,4 +42,9 @@ private:
 
 	int			mWidth = 800;
 	int			mHeight = 600;
+
+	HDC			mhDC;
+	HDC			mCanvasDC;
+	HBITMAP		mhBmp;
+	void* mCanvasBuffer{ nullptr };
 };

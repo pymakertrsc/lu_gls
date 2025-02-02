@@ -29,6 +29,24 @@ bool Application::initApplication(HINSTANCE hInstance, const uint32_t& width, co
 		return false;
 	}
 
+
+	mhDC = GetDC(mHwnd);
+	mCanvasDC = CreateCompatibleDC(mhDC);
+
+	BITMAPINFO  bmpInfo{};
+	bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bmpInfo.bmiHeader.biWidth = mWidth;
+	bmpInfo.bmiHeader.biHeight = mHeight;
+	bmpInfo.bmiHeader.biPlanes = 1;
+	bmpInfo.bmiHeader.biBitCount = 32;
+	bmpInfo.bmiHeader.biCompression = BI_RGB; //实际上存储方式为bgra
+
+	mhBmp = CreateDIBSection(mCanvasDC, &bmpInfo, DIB_RGB_COLORS, (void**)&mCanvasBuffer, 0, 0);//创建buffer的内存
+
+	SelectObject(mCanvasDC, mhBmp);
+
+	memset(mCanvasBuffer, 0, mWidth * mHeight * 4); //清空buffer为0
+
 	return true;
 }
 
@@ -56,14 +74,6 @@ BOOL Application::createWindow(HINSTANCE hInstance)
 {
 	mWindowInst = hInstance;
 
-	/*
-	* WS_POPUP:不需要标题栏，则不需要边框
-	* WS_OVERLAPPEDWINDOW：拥有普通程序主窗口的所有特点，必须有标题且有边框
-	*
-	* WS_CLIPSIBLINGS:被兄弟窗口挡住区域不绘制
-	* WS_CLIPCHILDREN:被子窗口遮挡住的区域不绘制
-	*/
-
 	auto dwExStyle = WS_EX_APPWINDOW;
 	auto dwStyle = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
@@ -77,10 +87,10 @@ BOOL Application::createWindow(HINSTANCE hInstance)
 
 	mHwnd = CreateWindowW(
 		mWindowClassName,
-		(LPCWSTR)"LuGraphicLearning",	//窗体标题
+		(LPCWSTR)"GraphicLearning",	//窗体标题
 		dwStyle,
-		500,//x位置相对左上角
-		500,//y位置相对左上角
+		500,//x位置，相对左上角
+		500,//y位置，相对左上角
 		windowRect.right - windowRect.left,
 		windowRect.bottom - windowRect.top,
 		nullptr,//父窗体
@@ -131,4 +141,8 @@ void Application::handleMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		break;
 	}
 	}
+}
+
+void Application::show() {
+	BitBlt(mhDC, 0, 0, mWidth, mHeight, mCanvasDC, 0, 0, SRCCOPY);
 }
