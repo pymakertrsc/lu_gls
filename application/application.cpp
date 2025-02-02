@@ -21,10 +21,10 @@ bool Application::initApplication(HINSTANCE hInstance, const uint32_t& width, co
 	mWidth = width;
 	mHeight = height;
 
-	//³õÊ¼»¯´°ÌåÀàĞÍ£¬²¢ÇÒ×¢²á
+	//åˆå§‹åŒ–çª—ä½“ç±»å‹ï¼Œå¹¶ä¸”æ³¨å†Œ
 	registerWindowClass(hInstance);
 
-	//Éú³ÉÒ»¸ö´°Ìå£¬²¢ÇÒÏÔÊ¾
+	//ç”Ÿæˆä¸€ä¸ªçª—ä½“ï¼Œå¹¶ä¸”æ˜¾ç¤º
 	if (!createWindow(hInstance)) {
 		return false;
 	}
@@ -37,17 +37,17 @@ ATOM Application::registerWindowClass(HINSTANCE hInstance)
 	WNDCLASSEXW wndClass;
 
 	wndClass.cbSize = sizeof(WNDCLASSEX);
-	wndClass.style = CS_HREDRAW | CS_VREDRAW;	//Ë®Æ½/´¹Ö±´óĞ¡·¢Éú±ä»¯ÖØ»æ´°¿Ú
+	wndClass.style = CS_HREDRAW | CS_VREDRAW;	//æ°´å¹³/å‚ç›´å¤§å°å‘ç”Ÿå˜åŒ–é‡ç»˜çª—å£
 	wndClass.lpfnWndProc = Wndproc;
 	wndClass.cbClsExtra = 0;
 	wndClass.cbWndExtra = 0;
-	wndClass.hInstance = hInstance;		//Ó¦ÓÃ³ÌĞò¾ä±ú
-	wndClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);//Ó¦ÓÃ³ÌĞòÍ¼±ê,¼´ÈÎÎñÀ¸µÄ´óÍ¼±ê
-	wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);//Êó±êÍ¼±ê
-	wndClass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);//´°¿Ú±³¾°É«
+	wndClass.hInstance = hInstance;		//åº”ç”¨ç¨‹åºå¥æŸ„
+	wndClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);//åº”ç”¨ç¨‹åºå›¾æ ‡,å³ä»»åŠ¡æ çš„å¤§å›¾æ ‡
+	wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);//é¼ æ ‡å›¾æ ‡
+	wndClass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);//çª—å£èƒŒæ™¯è‰²
 	wndClass.lpszMenuName = NULL;
-	wndClass.lpszClassName = mWindowClassName;//´°¿ÚÀàÃû
-	wndClass.hIconSm = LoadIcon(NULL, IDI_WINLOGO);//´°¿Ú±êÌâÍ¼±ê
+	wndClass.lpszClassName = mWindowClassName;//çª—å£ç±»å
+	wndClass.hIconSm = LoadIcon(NULL, IDI_WINLOGO);//çª—å£æ ‡é¢˜å›¾æ ‡
 
 	return RegisterClassExW(&wndClass);
 }
@@ -57,17 +57,17 @@ BOOL Application::createWindow(HINSTANCE hInstance)
 	mWindowInst = hInstance;
 
 	/*
-	* WS_POPUP:²»ĞèÒª±êÌâÀ¸£¬Ôò²»ĞèÒª±ß¿ò
-	* WS_OVERLAPPEDWINDOW£ºÓµÓĞÆÕÍ¨³ÌĞòÖ÷´°¿ÚµÄËùÓĞÌØµã£¬±ØĞëÓĞ±êÌâÇÒÓĞ±ß¿ò
+	* WS_POPUP:ä¸éœ€è¦æ ‡é¢˜æ ï¼Œåˆ™ä¸éœ€è¦è¾¹æ¡†
+	* WS_OVERLAPPEDWINDOWï¼šæ‹¥æœ‰æ™®é€šç¨‹åºä¸»çª—å£çš„æ‰€æœ‰ç‰¹ç‚¹ï¼Œå¿…é¡»æœ‰æ ‡é¢˜ä¸”æœ‰è¾¹æ¡†
 	*
-	* WS_CLIPSIBLINGS:±»ĞÖµÜ´°¿Úµ²×¡ÇøÓò²»»æÖÆ
-	* WS_CLIPCHILDREN:±»×Ó´°¿ÚÕÚµ²×¡µÄÇøÓò²»»æÖÆ
+	* WS_CLIPSIBLINGS:è¢«å…„å¼Ÿçª—å£æŒ¡ä½åŒºåŸŸä¸ç»˜åˆ¶
+	* WS_CLIPCHILDREN:è¢«å­çª—å£é®æŒ¡ä½çš„åŒºåŸŸä¸ç»˜åˆ¶
 	*/
 
 	auto dwExStyle = WS_EX_APPWINDOW;
 	auto dwStyle = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
-	//ÓÉÓÚ´æÔÚ±êÌâÀ¸µÈ£¬ËùÒÔĞèÒª¼ÆËãÖĞ¼äÏÔÊ¾ÇøÓòµÄ´óĞ¡,±ÈÈçPopUpµÄ´°Ìå£¬¾ÍÃ»ÓĞ±êÌâÀ¸£¬Ôò²»»á¸Ä±ä
+	//ç”±äºå­˜åœ¨æ ‡é¢˜æ ç­‰ï¼Œæ‰€ä»¥éœ€è¦è®¡ç®—ä¸­é—´æ˜¾ç¤ºåŒºåŸŸçš„å¤§å°,æ¯”å¦‚PopUpçš„çª—ä½“ï¼Œå°±æ²¡æœ‰æ ‡é¢˜æ ï¼Œåˆ™ä¸ä¼šæ”¹å˜
 	RECT windowRect;
 	windowRect.left = 0L;
 	windowRect.top = 0L;
@@ -77,16 +77,16 @@ BOOL Application::createWindow(HINSTANCE hInstance)
 
 	mHwnd = CreateWindowW(
 		mWindowClassName,
-		(LPCWSTR)"GraphicLearning",	//´°Ìå±êÌâ
+		(LPCWSTR)"LuGraphicLearning",	//çª—ä½“æ ‡é¢˜
 		dwStyle,
-		500,//xÎ»ÖÃ£¬Ïà¶Ô×óÉÏ½Ç
-		500,//yÎ»ÖÃ£¬Ïà¶Ô×óÉÏ½Ç
+		500,//xä½ç½®ç›¸å¯¹å·¦ä¸Šè§’
+		500,//yä½ç½®ç›¸å¯¹å·¦ä¸Šè§’
 		windowRect.right - windowRect.left,
 		windowRect.bottom - windowRect.top,
-		nullptr,//¸¸´°Ìå
-		nullptr,//²Ëµ¥À¸
-		hInstance,//³ÌĞòÊµÀı
-		nullptr);//¶îÍâ²ÎÊı
+		nullptr,//çˆ¶çª—ä½“
+		nullptr,//èœå•æ 
+		hInstance,//ç¨‹åºå®ä¾‹
+		nullptr);//é¢å¤–å‚æ•°
 
 
 	if (!mHwnd)
@@ -115,7 +115,7 @@ void Application::handleMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	switch (message)
 	{
 	case WM_CLOSE: {
-		DestroyWindow(hWnd);//´Ë´¦Ïú»Ù´°Ìå,»á×Ô¶¯·¢³öWM_DESTROY
+		DestroyWindow(hWnd);//æ­¤å¤„é”€æ¯çª—ä½“,ä¼šè‡ªåŠ¨å‘å‡ºWM_DESTROY
 		break;
 	}
 	case WM_PAINT:
@@ -126,7 +126,7 @@ void Application::handleMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	}
 	break;
 	case WM_DESTROY: {
-		PostQuitMessage(0);//·¢³öÏß³ÌÖÕÖ¹ÇëÇó
+		PostQuitMessage(0);//å‘å‡ºçº¿ç¨‹ç»ˆæ­¢è¯·æ±‚
 		mAlive = false;
 		break;
 	}

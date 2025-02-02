@@ -5,14 +5,14 @@
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup" )
 
 /*
-* 1 Ö÷Ñ­»·Á÷³ÌÔÚwinMainº¯ÊýÖÐ
-* 2 ´°Ìå¹¹½¨£¬ÏûÏ¢´¦Àí£¬ÆäËû·½ÃæµÄÏ¸½Ú¶¼·â×°ÔÚapplicationÀàÀïÃæ
+* 1 ä¸»å¾ªçŽ¯æµç¨‹åœ¨winMainå‡½æ•°ä¸­
+* 2 çª—ä½“æž„å»ºï¼Œæ¶ˆæ¯å¤„ç†ï¼Œå…¶ä»–æ–¹é¢çš„ç»†èŠ‚éƒ½å°è£…åœ¨applicationç±»é‡Œé¢
 */
 int APIENTRY wWinMain(
-	_In_ HINSTANCE hInstance,		//±¾Ó¦ÓÃ³ÌÐòÊµÀý¾ä±ú£¬Î¨Ò»Ö¸´úµ±Ç°³ÌÐò
-	_In_opt_ HINSTANCE hPrevInstance,	//±¾³ÌÐòÇ°Ò»¸öÊµÀý£¬Ò»°ãÊÇnull
-	_In_ LPWSTR    lpCmdLine,		//Ó¦ÓÃ³ÌÐòÔËÐÐ²ÎÊý
-	_In_ int       nCmdShow)		//´°¿ÚÈçºÎÏÔÊ¾£¨×î´ó»¯¡¢×îÐ¡»¯¡¢Òþ²Ø£©£¬²»ÐèÀí»á
+	_In_ HINSTANCE hInstance,		//æœ¬åº”ç”¨ç¨‹åºå®žä¾‹å¥æŸ„ï¼Œå”¯ä¸€æŒ‡ä»£å½“å‰ç¨‹åº
+	_In_opt_ HINSTANCE hPrevInstance,	//æœ¬ç¨‹åºå‰ä¸€ä¸ªå®žä¾‹ï¼Œä¸€èˆ¬æ˜¯null
+	_In_ LPWSTR    lpCmdLine,		//åº”ç”¨ç¨‹åºè¿è¡Œå‚æ•°
+	_In_ int       nCmdShow)		//çª—å£å¦‚ä½•æ˜¾ç¤ºï¼ˆæœ€å¤§åŒ–ã€æœ€å°åŒ–ã€éšè—ï¼‰ï¼Œä¸éœ€ç†ä¼š
 {
 	if (!app->initApplication(hInstance,800, 600)) {
 		return -1;
