@@ -5,14 +5,14 @@
 
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup" )
 
+Image* image01 = Image::createImage("assets/textures/sgs640.png");
+Image* image02 = Image::createImage("assets/textures/Brick_Diffuse.jpg");
 void render() {
 	sgl->clear();
 
-	Point p1{ 0, 100, RGBA(255, 0, 0, 255) };
-	Point p2{ 500, 100, RGBA(0, 255, 0, 255) };
-	Point p3{ 250, 500, RGBA(0, 0, 255, 255) };
-
-	sgl->drawTriangle(p1, p2, p3);
+	sgl->setBlending(true);
+	sgl->drawImage(image02);
+	sgl->drawImageWidthAlpha(image01, 100);
 }
 
 int APIENTRY wWinMain(

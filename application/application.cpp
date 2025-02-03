@@ -29,7 +29,13 @@ bool Application::initApplication(HINSTANCE hInstance, const uint32_t& width, co
 		return false;
 	}
 
-
+	//初始化画布
+	/*
+	* DC：Device Context 设备上下文描述对象
+	* 每个窗口都有自己对应的设备区域映射，即mhDC
+	* 这里创建一个与本窗口兼容的DC，mCanvasDC
+	* 可以从mCanvasDC向mhDC拷贝绘图数据内容
+	*/
 	mhDC = GetDC(mHwnd);
 	mCanvasDC = CreateCompatibleDC(mhDC);
 
@@ -41,8 +47,10 @@ bool Application::initApplication(HINSTANCE hInstance, const uint32_t& width, co
 	bmpInfo.bmiHeader.biBitCount = 32;
 	bmpInfo.bmiHeader.biCompression = BI_RGB; //实际上存储方式为bgra
 
-	mhBmp = CreateDIBSection(mCanvasDC, &bmpInfo, DIB_RGB_COLORS, (void**)&mCanvasBuffer, 0, 0);//创建buffer的内存
+	//创建与mhMem兼容的位图,其实实在mhMem指代的设备上划拨了一块内存，让mCanvasBuffer指向它
+	mhBmp = CreateDIBSection(mCanvasDC, &bmpInfo, DIB_RGB_COLORS, (void**)&mCanvasBuffer, 0, 0);//在这里创建buffer的内存
 
+	//一个设备可以创建多个位图，本设备使用mhBmp作为激活位图，对mCanvasDC的内存拷出，其实就是拷出了mhBmp的数据
 	SelectObject(mCanvasDC, mhBmp);
 
 	memset(mCanvasBuffer, 0, mWidth * mHeight * 4); //清空buffer为0
@@ -74,6 +82,14 @@ BOOL Application::createWindow(HINSTANCE hInstance)
 {
 	mWindowInst = hInstance;
 
+	/*
+	* WS_POPUP:不需要标题栏，则不需要边框
+	* WS_OVERLAPPEDWINDOW：拥有普通程序主窗口的所有特点，必须有标题且有边框
+	*
+	* WS_CLIPSIBLINGS:被兄弟窗口挡住区域不绘制
+	* WS_CLIPCHILDREN:被子窗口遮挡住的区域不绘制
+	*/
+
 	auto dwExStyle = WS_EX_APPWINDOW;
 	auto dwStyle = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
@@ -87,7 +103,7 @@ BOOL Application::createWindow(HINSTANCE hInstance)
 
 	mHwnd = CreateWindowW(
 		mWindowClassName,
-		(LPCWSTR)"LuGraphicLearning",	//窗体标题
+		(LPCWSTR)"LuGraphicLearning",
 		dwStyle,
 		500,//x位置，相对左上角
 		500,//y位置，相对左上角
