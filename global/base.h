@@ -30,3 +30,9 @@ struct RGBA {
 		mA = a;
 	}
 };
+
+struct Point {
+	int32_t x;
+	int32_t y;
+	RGBA color;
+};

@@ -9,12 +9,20 @@
 void render() {
 	sgl->clear();
 
-	for (uint32_t i = 0; i < app->getWidth(); ++i) {
-		for (uint32_t j = 0; j < app->getHeight(); ++j) {
-			uint32_t v = std::rand() % 255;
-			RGBA color(v, v, v, v);
-			sgl->drawPoint(i, j, color);
-		}
+
+
+	int r = 150;
+	Point c{ 400, 300, RGBA(255, 0, 0, 255) };
+
+	for (float i = 0; i < 360; i += 10)
+	{
+		float radian = DEG2RAD(i);
+		int x = r * sin(radian) + c.x;
+		int y = r * cos(radian) + c.y;
+
+		Point  pt{ x, y, RGBA(rand() % 255, rand() % 255, rand() % 255, 255) };
+
+		sgl->drawLine(c, pt);
 	}
 }
 

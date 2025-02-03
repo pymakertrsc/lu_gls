@@ -1,4 +1,5 @@
 #include "gpu.h"
+#include "raster.h"
 
 GPU* GPU::mInstance = nullptr;
 GPU* GPU::getInstance() {
@@ -27,9 +28,20 @@ void GPU::clear() {
 }
 
 void GPU::drawPoint(const uint32_t& x, const uint32_t& y, const RGBA& color) {
+	if (x >= mFrameBuffer->mWidth || y >= mFrameBuffer->mHeight) {
+		return;
+	}
+
 	//从窗口左下角开始算起
 	uint32_t pixelPos = y * mFrameBuffer->mWidth + x;
 	mFrameBuffer->mColorBuffer[pixelPos] = color;
 }
 
+void GPU::drawLine(const Point& p1, const Point& p2) {
+	std::vector<Point> pixels;
+	Raster::rasterizeLine(pixels, p1, p2);
 
+	for (auto p : pixels) {
+		drawPoint(p.x, p.y, p.color);
+	}
+}
