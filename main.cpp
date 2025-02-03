@@ -5,25 +5,14 @@
 
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup" )
 
-
 void render() {
 	sgl->clear();
 
+	Point p1{ 0, 100, RGBA(255, 0, 0, 255) };
+	Point p2{ 500, 100, RGBA(0, 255, 0, 255) };
+	Point p3{ 250, 500, RGBA(0, 0, 255, 255) };
 
-
-	int r = 150;
-	Point c{ 400, 300, RGBA(255, 0, 0, 255) };
-
-	for (float i = 0; i < 360; i += 10)
-	{
-		float radian = DEG2RAD(i);
-		int x = r * sin(radian) + c.x;
-		int y = r * cos(radian) + c.y;
-
-		Point  pt{ x, y, RGBA(rand() % 255, rand() % 255, rand() % 255, 255) };
-
-		sgl->drawLine(c, pt);
-	}
+	sgl->drawTriangle(p1, p2, p3);
 }
 
 int APIENTRY wWinMain(

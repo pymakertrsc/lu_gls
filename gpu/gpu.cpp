@@ -45,3 +45,12 @@ void GPU::drawLine(const Point& p1, const Point& p2) {
 		drawPoint(p.x, p.y, p.color);
 	}
 }
+
+void GPU::drawTriangle(const Point& p1, const Point& p2, const Point& p3) {
+	std::vector<Point> pixels;
+	Raster::rasterizeTriangle(pixels, p1, p2, p3);
+
+	for (auto p : pixels) {
+		drawPoint(p.x, p.y, p.color);
+	}
+}

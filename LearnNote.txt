@@ -2,4 +2,16 @@
 1.Brensenham直线绘制算法
 绘制直线最简单的方法是，根据直线公式y=kx+b直接步进绘制，但是这么做有k*x这样的浮点数乘法运算和+b这种浮点数加法运算，效率较低
 Brensenham直线绘制算法省略了浮点数运算
+参考资料：
 https://blog.csdn.net/Jason6620/article/details/127835432?ops_request_misc=%257B%2522request%255Fid%2522%253A%252278320e8d2c974ea5f38f502ae1e9c76b%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=78320e8d2c974ea5f38f502ae1e9c76b&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-1-127835432-null-null.142^v101^control&utm_term=Brensenham%E7%9B%B4%E7%BA%BF%E7%BB%98%E5%88%B6%E7%AE%97%E6%B3%95&spm=1018.2226.3001.4187
+2.三角形绘制算法
+给出屏幕像素上三个点（v0， v1 , v2)，计算并返回构成三角形所包围的像素集合
+算法思想：
+• 找到本三角形的最小包围盒范围
+• 遍历包围盒内的像素，使用叉乘判断是否在三角形内
+• 三角形内所有像素组成集合返回
+参考资料：https://blog.csdn.net/wsyzxxn9/article/details/113556864?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522a3e8345c84747f039ac1140b97c5e11a%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=a3e8345c84747f039ac1140b97c5e11a&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-2-113556864-null-null.142^v101^control&utm_term=%E4%B8%89%E8%A7%92%E5%BD%A2%E7%BB%98%E5%88%B6%E7%AE%97%E6%B3%95&spm=1018.2226.3001.4187
+3.三角形重心坐标
+·重心坐标可以理解为，P点位置坐标是由ABC三个顶点位置按比例加和而成，或者说按照比例“烹饪”而成
+• 如果ABC拥有其他属性（比如颜色），那么也可以按照相同的比例调配出P点的属性
+
