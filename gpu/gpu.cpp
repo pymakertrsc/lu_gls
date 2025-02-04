@@ -32,6 +32,7 @@ void GPU::drawPoint(const uint32_t& x, const uint32_t& y, const RGBA& color) {
 		return;
 	}
 
+
 	//从窗口左下角开始算起
 	uint32_t pixelPos = y * mFrameBuffer->mWidth + x;
 
@@ -49,7 +50,7 @@ void GPU::drawPoint(const uint32_t& x, const uint32_t& y, const RGBA& color) {
 		result.mB = static_cast<float>(src.mB) * weight + static_cast<float>(dst.mB) * (1.0f - weight);
 		result.mA = static_cast<float>(src.mA) * weight + static_cast<float>(dst.mA) * (1.0f - weight);
 	}
-
+	
 
 	mFrameBuffer->mColorBuffer[pixelPos] = result;
 }
@@ -68,7 +69,7 @@ void GPU::drawTriangle(const Point& p1, const Point& p2, const Point& p3) {
 	Raster::rasterizeTriangle(pixels, p1, p2, p3);
 
 	RGBA resultColor;
-	for (auto& p : pixels) {
+	for (auto &p : pixels) {
 		if (mImage) {
 			resultColor = sampleNearest(p.uv);
 		}
@@ -112,6 +113,9 @@ void GPU::setTexture(Image* image) {
 RGBA GPU::sampleNearest(const math::vec2f& uv) {
 	auto myUV = uv;
 
+	//四舍五入到最近整数
+	// u = 0 对应 x = 0，u = 1 对应 x = width - 1
+	// v = 0 对应 y = 0，v = 1 对应 y = height - 1
 	int x = std::round(myUV.x * (mImage->mWidth - 1));
 	int y = std::round(myUV.y * (mImage->mHeight - 1));
 
