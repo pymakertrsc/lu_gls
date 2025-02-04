@@ -5,6 +5,7 @@
 #include<map>
 #include<cmath>
 #include<assert.h>
+#include "../math/math.h"
 
 #define PI					3.14159265358979323
 #define DEG2RAD(theta)		(0.01745329251994329 * (theta))
@@ -35,4 +36,5 @@ struct Point {
 	int32_t x;
 	int32_t y;
 	RGBA color;
+	math::vec2f uv;
 };

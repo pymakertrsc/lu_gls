@@ -13,7 +13,7 @@ void Raster::rasterizeLine(
 	Point start = v0;
 	Point end = v1;
 
-	//1 ±£Ö¤x·½ÏòÊÇ´ÓĞ¡µ½´óµÄ
+	//1 ä¿è¯xæ–¹å‘æ˜¯ä»å°åˆ°å¤§çš„
 	if (start.x > end.x) {
 		auto tmp = start;
 		start = end;
@@ -22,7 +22,7 @@ void Raster::rasterizeLine(
 
 	results.push_back(start);
 
-	//2 ±£Ö¤y·½ÏòÒ²ÊÇ´ÓĞ¡µ½´ó£¬Èç¹ûĞèÒª·­×ª£¬±ØĞë¼ÇÂ¼
+	//2 ä¿è¯yæ–¹å‘ä¹Ÿæ˜¯ä»å°åˆ°å¤§ï¼Œå¦‚æœéœ€è¦ç¿»è½¬ï¼Œå¿…é¡»è®°å½•
 	bool flipY = false;
 	if (start.y > end.y) {
 		start.y *= -1.0f;
@@ -30,7 +30,7 @@ void Raster::rasterizeLine(
 		flipY = true;
 	}
 
-	//3 ±£Ö¤Ğ±ÂÊÔÚ0-1Ö®¼ä£¬Èç¹ûĞèÒªµ÷Õû£¬±ØĞë¼ÇÂ¼
+	//3 ä¿è¯æ–œç‡åœ¨0-1ä¹‹é—´ï¼Œå¦‚æœéœ€è¦è°ƒæ•´ï¼Œå¿…é¡»è®°å½•
 	int deltaX = static_cast<int>(end.x - start.x);
 	int deltaY = static_cast<int>(end.y - start.y);
 
@@ -61,7 +61,7 @@ void Raster::rasterizeLine(
 		currentX += 1;
 		p += 2 * deltaY;
 
-		//´¦ÀíĞÂxy£¬flip and swap
+		//å¤„ç†æ–°xyï¼Œflip and swap
 
 		resultX = currentX;
 		resultY = currentY;
@@ -73,7 +73,7 @@ void Raster::rasterizeLine(
 			resultY *= -1;
 		}
 
-		//²úÉúĞÂ¶¥µã
+		//äº§ç”Ÿæ–°é¡¶ç‚¹
 		currentPoint.x = resultX;
 		currentPoint.y = resultY;
 
@@ -87,10 +87,11 @@ void Raster::rasterizeLine(
 void Raster::interpolantLine(const Point& v0, const Point& v1, Point& target) {
 	float weight = 1.0f;
 	if (v1.x != v0.x) {
-		//ÓÃx×ö±ÈÀı
+		//ç”¨xåšæ¯”ä¾‹
 		weight = (float)(target.x - v0.x) / (float)(v1.x - v0.x);
-	}else if (v1.y != v0.y) {
-		//ÓÃy×ö±ÈÀı
+	}
+	else if (v1.y != v0.y) {
+		//ç”¨yåšæ¯”ä¾‹
 		weight = (float)(target.y - v0.y) / (float)(v1.y - v0.y);
 	}
 
@@ -147,7 +148,7 @@ void Raster::interpolantTriangle(const Point& v0, const Point& v1, const Point& 
 	auto pv0 = math::vec2f(v0.x - p.x, v0.y - p.y);
 	auto pv1 = math::vec2f(v1.x - p.x, v1.y - p.y);
 	auto pv2 = math::vec2f(v2.x - p.x, v2.y - p.y);
-	//¼ÆËãv0µÄÈ¨ÖØ
+	//è®¡ç®—v0çš„æƒé‡
 
 	float v0Area = std::abs(math::cross(pv1, pv2));
 	float v1Area = std::abs(math::cross(pv0, pv2));
@@ -157,15 +158,38 @@ void Raster::interpolantTriangle(const Point& v0, const Point& v1, const Point& 
 	float weight1 = v1Area / sumArea;
 	float weight2 = v2Area / sumArea;
 
+	//å¯¹äºé¢œè‰²çš„æ’å€¼
+	p.color = lerpRGBA(v0.color, v1.color, v2.color, weight0, weight1, weight2);
+
+	//å¯¹äºuvåæ ‡çš„æ’å€¼
+	p.uv = lerpUV(v0.uv, v1.uv, v2.uv, weight0, weight1, weight2);
+}
+
+RGBA Raster::lerpRGBA(const RGBA& c0, const RGBA& c1, float weight) {
 	RGBA result;
-	auto c0 = v0.color;
-	auto c1 = v1.color;
-	auto c2 = v2.color;
+
+	result.mR = static_cast<float>(c1.mR) * weight + static_cast<float>(c0.mR) * (1.0f - weight);
+	result.mG = static_cast<float>(c1.mG) * weight + static_cast<float>(c0.mG) * (1.0f - weight);
+	result.mB = static_cast<float>(c1.mB) * weight + static_cast<float>(c0.mB) * (1.0f - weight);
+	result.mA = static_cast<float>(c1.mA) * weight + static_cast<float>(c0.mA) * (1.0f - weight);
+
+	return result;
+}
+
+RGBA Raster::lerpRGBA(const RGBA& c0, const RGBA& c1, const RGBA& c2, float weight0, float weight1, float weight2) {
+	RGBA result;
 
 	result.mR = static_cast<float>(c0.mR) * weight0 + static_cast<float>(c1.mR) * weight1 + static_cast<float>(c2.mR) * weight2;
 	result.mG = static_cast<float>(c0.mG) * weight0 + static_cast<float>(c1.mG) * weight1 + static_cast<float>(c2.mG) * weight2;
 	result.mB = static_cast<float>(c0.mB) * weight0 + static_cast<float>(c1.mB) * weight1 + static_cast<float>(c2.mB) * weight2;
 	result.mA = static_cast<float>(c0.mA) * weight0 + static_cast<float>(c1.mA) * weight1 + static_cast<float>(c2.mA) * weight2;
 
-	p.color = result;
+	return result;
+}
+
+math::vec2f Raster::lerpUV(const math::vec2f& uv0, const math::vec2f& uv1, const math::vec2f& uv2, float weight0, float weight1, float weight2) {
+	math::vec2f uv;
+
+	uv = uv0 * weight0 + uv1 * weight1 + uv2 * weight2;
+	return uv;
 }

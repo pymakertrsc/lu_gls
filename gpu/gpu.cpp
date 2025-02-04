@@ -58,7 +58,7 @@ void GPU::drawLine(const Point& p1, const Point& p2) {
 	std::vector<Point> pixels;
 	Raster::rasterizeLine(pixels, p1, p2);
 
-	for (auto p : pixels) {
+	for (auto& p : pixels) {
 		drawPoint(p.x, p.y, p.color);
 	}
 }
@@ -67,8 +67,16 @@ void GPU::drawTriangle(const Point& p1, const Point& p2, const Point& p3) {
 	std::vector<Point> pixels;
 	Raster::rasterizeTriangle(pixels, p1, p2, p3);
 
-	for (auto p : pixels) {
-		drawPoint(p.x, p.y, p.color);
+	RGBA resultColor;
+	for (auto& p : pixels) {
+		if (mImage) {
+			resultColor = sampleNearest(p.uv);
+		}
+		else {
+			resultColor = p.color;
+		}
+
+		drawPoint(p.x, p.y, resultColor);
 	}
 }
 
@@ -95,4 +103,18 @@ void GPU::drawImageWidthAlpha(const Image* image, const uint32_t& alpha) {
 //设置状态
 void GPU::setBlending(bool enable) {
 	mEnableBlending = enable;
+}
+
+void GPU::setTexture(Image* image) {
+	mImage = image;
+}
+
+RGBA GPU::sampleNearest(const math::vec2f& uv) {
+	auto myUV = uv;
+
+	int x = std::round(myUV.x * (mImage->mWidth - 1));
+	int y = std::round(myUV.y * (mImage->mHeight - 1));
+
+	int position = y * mImage->mWidth + x;
+	return mImage->mData[position];
 }
