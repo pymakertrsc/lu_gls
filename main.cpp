@@ -27,7 +27,7 @@ void render() {
 }
 
 void prepare() {
-	texture = Image::createImage("assets/textures/sgs640.jpg");
+	texture = Image::createImage("assets/textures/sgs640.png");
 
 	p1.x = 0;
 	p1.y = 0;
