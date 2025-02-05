@@ -32,7 +32,6 @@ void GPU::drawPoint(const uint32_t& x, const uint32_t& y, const RGBA& color) {
 		return;
 	}
 
-
 	//从窗口左下角开始算起
 	uint32_t pixelPos = y * mFrameBuffer->mWidth + x;
 
@@ -50,7 +49,7 @@ void GPU::drawPoint(const uint32_t& x, const uint32_t& y, const RGBA& color) {
 		result.mB = static_cast<float>(src.mB) * weight + static_cast<float>(dst.mB) * (1.0f - weight);
 		result.mA = static_cast<float>(src.mA) * weight + static_cast<float>(dst.mA) * (1.0f - weight);
 	}
-	
+
 
 	mFrameBuffer->mColorBuffer[pixelPos] = result;
 }
@@ -76,6 +75,7 @@ void GPU::drawTriangle(const Point& p1, const Point& p2, const Point& p3) {
 		else {
 			resultColor = p.color;
 		}
+
 
 		drawPoint(p.x, p.y, resultColor);
 	}
@@ -114,8 +114,15 @@ void GPU::setTexture(Image* image) {
 	mImage = image;
 }
 
+void GPU::setTextureWrap(uint32_t wrap) {
+	mWrap = wrap;
+}
+
 RGBA GPU::sampleNearest(const math::vec2f& uv) {
 	auto myUV = uv;
+
+	checkWrap(myUV.x);
+	checkWrap(myUV.y);
 
 	//四舍五入到最近整数
 	// u = 0 对应 x = 0，u = 1 对应 x = width - 1
@@ -130,8 +137,12 @@ RGBA GPU::sampleNearest(const math::vec2f& uv) {
 RGBA GPU::sampleBilinear(const math::vec2f& uv) {
 	RGBA resultColor;
 
-	float x = uv.x * static_cast<float>(mImage->mWidth - 1);
-	float y = uv.y * static_cast<float>(mImage->mHeight - 1);
+	auto myUV = uv;
+	checkWrap(myUV.x);
+	checkWrap(myUV.y);
+
+	float x = myUV.x * static_cast<float>(mImage->mWidth - 1);
+	float y = myUV.y * static_cast<float>(mImage->mHeight - 1);
 
 	int left = std::floor(x);
 	int right = std::ceil(x);
@@ -168,4 +179,20 @@ RGBA GPU::sampleBilinear(const math::vec2f& uv) {
 
 
 	return resultColor;
+}
+
+void GPU::checkWrap(float& n) {
+	if (n > 1.0f || n < 0.0f) {
+		n = FRACTION(n);
+		switch (mWrap) {
+		case TEXTURE_WRAP_REPEAT:
+			n = FRACTION(n + 1);
+			break;
+		case TEXTURE_WRAP_MIRROR:
+			n = 1.0f - FRACTION(n + 1);
+			break;
+		default:
+			break;
+		}
+	}
 }

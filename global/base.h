@@ -33,8 +33,11 @@ struct RGBA {
 };
 
 struct Point {
-	int32_t x;
-	int32_t y;
+	int32_t x{ 0 };
+	int32_t y{ 0 };
 	RGBA color;
 	math::vec2f uv;
 };
+
+#define TEXTURE_WRAP_REPEAT 0
+#define TEXTURE_WRAP_MIRROR 1

@@ -21,7 +21,8 @@ Image* Image::createImage(const std::string& path) {
 	int picType = 0;
 	int width{ 0 }, height{ 0 };
 
-
+	//stbimage读入的图片,原点在左上角，y轴是向下生长的
+	//我方图形程序认为，图片应该是左下角为0，0；故需要翻转y轴
 	stbi_set_flip_vertically_on_load(true);
 
 	//由于我们是BGRA的格式，图片是RGBA的格式，所以得交换下R&B

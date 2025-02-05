@@ -89,8 +89,7 @@ void Raster::interpolantLine(const Point& v0, const Point& v1, Point& target) {
 	if (v1.x != v0.x) {
 		//用x做比例
 		weight = (float)(target.x - v0.x) / (float)(v1.x - v0.x);
-	}
-	else if (v1.y != v0.y) {
+	}else if (v1.y != v0.y) {
 		//用y做比例
 		weight = (float)(target.y - v0.y) / (float)(v1.y - v0.y);
 	}
@@ -126,8 +125,8 @@ void Raster::rasterizeTriangle(
 			auto cross2 = math::cross(pv1, pv2);
 			auto cross3 = math::cross(pv2, pv0);
 
-			bool negativeAll = cross1 < 0 && cross2 < 0 && cross3 < 0;
-			bool positiveAll = cross1 > 0 && cross2 > 0 && cross3 > 0;
+			bool negativeAll = cross1 <= 0 && cross2 <= 0 && cross3 <= 0;
+			bool positiveAll = cross1 >= 0 && cross2 >= 0 && cross3 >= 0;
 
 			if (negativeAll || positiveAll) {
 				result.x = i;
@@ -175,6 +174,7 @@ RGBA Raster::lerpRGBA(const RGBA& c0, const RGBA& c1, float weight) {
 
 	return result;
 }
+
 
 RGBA Raster::lerpRGBA(const RGBA& c0, const RGBA& c1, const RGBA& c2, float weight0, float weight1, float weight2) {
 	RGBA result;

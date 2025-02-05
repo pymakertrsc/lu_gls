@@ -7,7 +7,10 @@
 
 #define sgl GPU::getInstance()
 
-
+/*
+* class GPU：
+* 模拟GPU的绘图行为以及算法等
+*/
 class GPU {
 public:
 	static GPU* getInstance();
@@ -32,20 +35,26 @@ public:
 
 	void drawImageWidthAlpha(const Image* image, const uint32_t& alpha);
 
-	//设置状态
+	//设置
 	void setBlending(bool enable);
+
 	void setBilinear(bool enable);
+
 	void setTexture(Image* image);
+
+	void setTextureWrap(uint32_t wrap);
 
 private:
 	RGBA sampleNearest(const math::vec2f& uv);
 	RGBA sampleBilinear(const math::vec2f& uv);
+	void checkWrap(float& n);
 
 private:
 	static GPU* mInstance;
 
 	bool mEnableBlending{ false };
 	bool mEnableBilinear{ false };
+	uint32_t mWrap{ TEXTURE_WRAP_REPEAT };
 
 	FrameBuffer* mFrameBuffer{ nullptr };
 
