@@ -14,5 +14,6 @@ public:
 	uint32_t	mWidth{ 0 };
 	uint32_t	mHeight{ 0 };
 	RGBA*		mColorBuffer{ nullptr };
+	float*		mDepthBuffer{ nullptr };
 	bool		mExternBuffer{ false };
 };

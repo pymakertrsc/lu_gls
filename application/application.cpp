@@ -1,10 +1,12 @@
 #include"application.h"
+#include<windowsx.h>
 
 Application* Application::mInstance = nullptr;
 Application* Application::getInstance() {
 	if (mInstance == nullptr) {
 		mInstance = new Application();
 	}
+
 
 	return mInstance;
 }
@@ -103,7 +105,7 @@ BOOL Application::createWindow(HINSTANCE hInstance)
 
 	mHwnd = CreateWindowW(
 		mWindowClassName,
-		(LPCWSTR)"LuGraphicLearning",
+		(LPCWSTR)"LuGraphicLearning",	//窗体标题
 		dwStyle,
 		500,//x位置，相对左上角
 		500,//y位置，相对左上角
@@ -140,6 +142,37 @@ bool Application::peekMessage() {
 void Application::handleMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message)
 	{
+	case WM_KEYDOWN: {
+		if (mCamera) {
+			mCamera->onKeyDown(wParam);
+		}
+		break;
+	}
+	case WM_KEYUP: {
+		if (mCamera) {
+			mCamera->onKeyUp(wParam);
+		}
+		break;
+	}
+	case WM_RBUTTONDOWN: {
+		if (mCamera) {
+			mCamera->onRMouseDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		}
+		break;
+	}
+	case WM_RBUTTONUP: {
+		if (mCamera) {
+			mCamera->onRMouseUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		}
+		break;
+	}
+
+	case WM_MOUSEMOVE: {
+		if (mCamera) {
+			mCamera->onMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		}
+		break;
+	}
 	case WM_CLOSE: {
 		DestroyWindow(hWnd);//此处销毁窗体,会自动发出WM_DESTROY
 		break;
@@ -161,4 +194,8 @@ void Application::handleMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 void Application::show() {
 	BitBlt(mhDC, 0, 0, mWidth, mHeight, mCanvasDC, 0, 0, SRCCOPY);
+}
+
+void Application::setCamera(Camera* camera) {
+	mCamera = camera;
 }

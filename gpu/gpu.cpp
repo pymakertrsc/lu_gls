@@ -1,5 +1,6 @@
 #include "gpu.h"
 #include "raster.h"
+#include "clipper.h"
 
 GPU* GPU::mInstance = nullptr;
 GPU* GPU::getInstance() {
@@ -16,183 +17,474 @@ GPU::~GPU() {
 	if (mFrameBuffer) {
 		delete mFrameBuffer;
 	}
+
+	for (auto iter : mBufferMap) {
+		delete iter.second;
+	}
+	mBufferMap.clear();
+
+	for (auto iter : mVaoMap) {
+		delete iter.second;
+	}
+	mVaoMap.clear();
+
+	for (auto iter : mTextureMap) {
+		delete iter.second;
+	}
+	mTextureMap.clear();
 }
 
 void GPU::initSurface(const uint32_t& width, const uint32_t& height, void* buffer) {
 	mFrameBuffer = new FrameBuffer(width, height, buffer);
+	mScreenMatrix = math::screenMatrix<float>(width - 1, height - 1);
 }
 
 void GPU::clear() {
 	size_t pixelSize = mFrameBuffer->mWidth * mFrameBuffer->mHeight;
-	std::fill_n(mFrameBuffer->mColorBuffer, pixelSize, RGBA(0, 0, 0, 0));
+	std::fill_n(mFrameBuffer->mColorBuffer, pixelSize, RGBA(255, 255, 255, 255));
+	std::fill_n(mFrameBuffer->mDepthBuffer, pixelSize, 1.0f);
 }
 
-void GPU::drawPoint(const uint32_t& x, const uint32_t& y, const RGBA& color) {
-	if (x >= mFrameBuffer->mWidth || y >= mFrameBuffer->mHeight) {
+void GPU::printVAO(const uint32_t& vaoID) {
+	auto iter = mVaoMap.find(vaoID);
+	if (iter != mVaoMap.end()) {
+		iter->second->print();
+	}
+}
+
+uint32_t GPU::genBuffer() {
+	mBufferCounter++;
+	mBufferMap.insert(std::make_pair(mBufferCounter, new BufferObject()));
+
+	return mBufferCounter;
+}
+
+void GPU::deleteBuffer(const uint32_t& bufferID) {
+	auto iter = mBufferMap.find(bufferID);
+	if (iter != mBufferMap.end()) {
+		delete iter->second;
+	}
+	else {
 		return;
 	}
 
-	//ä»çª—å£å·¦ä¸‹è§’å¼€å§‹ç®—èµ·
-	uint32_t pixelPos = y * mFrameBuffer->mWidth + x;
-
-
-	RGBA result = color;
-
-	if (mEnableBlending) {
-		//åŠ å…¥blending
-		auto src = color;
-		auto dst = mFrameBuffer->mColorBuffer[pixelPos];
-		float weight = static_cast<float>(src.mA) / 255.0f;
-
-		result.mR = static_cast<float>(src.mR) * weight + static_cast<float>(dst.mR) * (1.0f - weight);
-		result.mG = static_cast<float>(src.mG) * weight + static_cast<float>(dst.mG) * (1.0f - weight);
-		result.mB = static_cast<float>(src.mB) * weight + static_cast<float>(dst.mB) * (1.0f - weight);
-		result.mA = static_cast<float>(src.mA) * weight + static_cast<float>(dst.mA) * (1.0f - weight);
-	}
-
-
-	mFrameBuffer->mColorBuffer[pixelPos] = result;
+	mBufferMap.erase(iter);
 }
 
-void GPU::drawLine(const Point& p1, const Point& p2) {
-	std::vector<Point> pixels;
-	Raster::rasterizeLine(pixels, p1, p2);
-
-	for (auto& p : pixels) {
-		drawPoint(p.x, p.y, p.color);
+void GPU::bindBuffer(const uint32_t& bufferType, const uint32_t& bufferID) {
+	if (bufferType == ARRAY_BUFFER) {
+		mCurrentVBO = bufferID;
+	}
+	else if (bufferType == ELEMENT_ARRAY_BUFFER) {
+		mCurrentEBO = bufferID;
 	}
 }
 
-void GPU::drawTriangle(const Point& p1, const Point& p2, const Point& p3) {
-	std::vector<Point> pixels;
-	Raster::rasterizeTriangle(pixels, p1, p2, p3);
+void GPU::bufferData(const uint32_t& bufferType, size_t dataSize, void* data) {
+	uint32_t bufferID = 0;
+	if (bufferType == ARRAY_BUFFER) {
+		bufferID = mCurrentVBO;
+	}
+	else if (bufferType == ELEMENT_ARRAY_BUFFER) {
+		bufferID = mCurrentEBO;
+	}
+	else {
+		assert(false);
+	}
 
-	RGBA resultColor;
-	for (auto& p : pixels) {
-		if (mImage) {
-			resultColor = mEnableBilinear ? sampleBilinear(p.uv) : sampleNearest(p.uv);
+	auto iter = mBufferMap.find(bufferID);
+	if (iter == mBufferMap.end()) {
+		assert(false);
+	}
+
+	BufferObject* bufferObject = iter->second;
+	bufferObject->setBufferData(dataSize, data);
+}
+
+uint32_t GPU::genVertexArray() {
+	mVaoCounter++;
+	mVaoMap.insert(std::make_pair(mVaoCounter, new VertexArrayObject()));
+
+	return mVaoCounter;
+}
+
+void GPU::deleteVertexArray(const uint32_t& vaoID) {
+	auto iter = mVaoMap.find(vaoID);
+	if (iter != mVaoMap.end()) {
+		delete iter->second;
+	}
+	else {
+		return;
+	}
+
+	mVaoMap.erase(iter);
+}
+
+void GPU::bindVertexArray(const uint32_t& vaoID) {
+	mCurrentVAO = vaoID;
+}
+
+void GPU::vertexAttributePointer(
+	const uint32_t& binding,
+	const uint32_t& itemSize,
+	const uint32_t& stride,
+	const uint32_t& offset)
+{
+	auto iter = mVaoMap.find(mCurrentVAO);
+	if (iter == mVaoMap.end()) {
+		assert(false);
+	}
+
+	auto vao = iter->second;
+	vao->set(binding, mCurrentVBO, itemSize, stride, offset);
+}
+
+void GPU::useProgram(Shader* shader) {
+	mShader = shader;
+}
+
+void GPU::enable(const uint32_t& value) {
+	switch (value)
+	{
+	case CULL_FACE:
+		mEnableCullFace = true;
+		break;
+	case DEPTH_TEST:
+		mEnableDepthTest = true;
+		break;
+	case BLENDING:
+		mEnableBlending = true;
+		break;
+	default:
+		break;
+	}
+}
+
+void GPU::disable(const uint32_t& value) {
+	switch (value)
+	{
+	case CULL_FACE:
+		mEnableCullFace = false;
+		break;
+	case DEPTH_TEST:
+		mEnableDepthTest = false;
+		break;
+	case BLENDING:
+		mEnableBlending = false;
+		break;
+	default:
+		break;
+	}
+}
+
+void GPU::frontFace(const uint32_t& value) {
+	mFrontFace = value;
+}
+
+void GPU::cullFace(const uint32_t& value) {
+	mCullFace = value;
+}
+
+void GPU::depthFunc(const uint32_t& depthFunc) {
+	mDepthFunc = depthFunc;
+}
+
+uint32_t GPU::genTexture() {
+	mTextureCounter++;
+	mTextureMap.insert(std::make_pair(mTextureCounter, new Texture()));
+
+	return mTextureCounter;
+}
+
+void GPU::deleteTexture(const uint32_t& texID) {
+	auto iter = mTextureMap.find(texID);
+	if (iter != mTextureMap.end()) {
+		delete iter->second;
+	}
+	else {
+		return;
+	}
+
+	mTextureMap.erase(iter);
+}
+
+void GPU::bindTexture(const uint32_t& texID) {
+	mCurrentTexture = texID;
+}
+
+void GPU::texImage2D(const uint32_t& width, const uint32_t& height, void* data) {
+	if (!mCurrentTexture) {
+		return;
+	}
+
+	auto iter = mTextureMap.find(mCurrentTexture);
+	if (iter == mTextureMap.end()) {
+		return;
+	}
+	auto texture = iter->second;
+	texture->setBufferData(width, height, data);
+}
+
+void GPU::texParameter(const uint32_t& param, const uint32_t& value) {
+	if (!mCurrentTexture) {
+		return;
+	}
+
+	auto iter = mTextureMap.find(mCurrentTexture);
+	if (iter == mTextureMap.end()) {
+		return;
+	}
+	auto texture = iter->second;
+	texture->setParameter(param, value);
+}
+
+void GPU::drawElement(const uint32_t& drawMode, const uint32_t& first, const uint32_t& count) {
+	if (mCurrentVAO == 0 || mShader == nullptr || count == 0) {
+		return;
+	}
+
+	//1 get vao
+	auto vaoIter = mVaoMap.find(mCurrentVAO);
+	if (vaoIter == mVaoMap.end()) {
+		std::cerr << "Error: current vao is invalid!" << std::endl;
+		return;
+	}
+
+	const VertexArrayObject* vao = vaoIter->second;
+	auto bindingMap = vao->getBindingMap();
+
+	//2 get ebo
+	auto eboIter = mBufferMap.find(mCurrentEBO);
+	if (eboIter == mBufferMap.end()) {
+		std::cerr << "Error: current ebo is invalid!" << std::endl;
+		return;
+	}
+
+	const BufferObject* ebo = eboIter->second;
+
+	/*
+	* VertexShader´¦Àí½×¶Î
+	* ×÷ÓÃ£º
+	*	°´ÕÕÊäÈëµÄEboµÄindexË³ĞòÀ´´¦Àí¶¥µã£¬ÒÀ´ÎÍ¨¹ıvsShader£¬
+		µÃµ½µÄÊä³ö½á¹û°´Ğò·ÅÈëvsOutputsÖĞ
+	*/
+	std::vector<VsOutput> vsOutputs{};
+	vertexShaderStage(vsOutputs, vao, ebo, first, count);
+
+	if (vsOutputs.empty()) return;
+
+	/*
+	* Clip Space´¦Àí½×¶Î
+	* ×÷ÓÃ£º
+	*	ÔÚ¼ô²Ã¿Õ¼ä£¬¶ÔËùÓĞÊä³öµÄÍ¼Ôª½øĞĞ¼ô²ÃÆ´½ÓµÈ
+	*/
+	std::vector<VsOutput> clipOutputs{};
+	Clipper::doClipSpace(drawMode, vsOutputs, clipOutputs);
+	if (clipOutputs.empty()) return;
+
+	vsOutputs.clear();
+
+	/*
+	* NDC´¦Àí½×¶Î
+	* ×÷ÓÃ£º
+	*	½«¶¥µã×ª»¯µ½NDCÏÂ
+	*/
+	for (auto& output : clipOutputs) {
+		perspectiveDivision(output);
+	}
+
+	/*
+	* ±³ÃæÌŞ³ı½×¶Î
+	* ×÷ÓÃ£º
+	*	±³ÏòÎÒÃÇµÄÈı½ÇĞÎĞèÒªÌŞ³ı
+	*/
+	std::vector<VsOutput> cullOutputs = clipOutputs;
+	if (drawMode == DRAW_TRIANGLES && mEnableCullFace) {
+		cullOutputs.clear();
+		for (uint32_t i = 0; i < clipOutputs.size() - 2; i += 3) {
+			if (Clipper::cullFace(mFrontFace, mCullFace, clipOutputs[i], clipOutputs[i + 1], clipOutputs[i + 2])) {
+				auto start = clipOutputs.begin() + i;
+				auto end = clipOutputs.begin() + i + 3;
+				cullOutputs.insert(cullOutputs.end(), start, end);
+			}
+		}
+	}
+	//clipOutputs.clear();
+	/*
+	* ÆÁÄ»Ó³Éä´¦Àí½×¶Î
+	* ×÷ÓÃ£º
+	*	½«NDCÏÂµÄµã£¬Í¨¹ıscreenMatrix£¬×ª»¯µ½ÆÁÄ»¿Õ¼ä
+	*/
+	for (auto& output : cullOutputs) {
+		screenMapping(output);
+	}
+
+	/*
+	* ¹âÕ¤»¯´¦Àí½×¶Î
+	* ×÷ÓÃ£º
+	*	ÀëÉ¢³öËùÓĞĞèÒªµÄFragment
+	*/
+	std::vector<VsOutput> rasterOutputs;
+	Raster::rasterize(rasterOutputs, drawMode, cullOutputs);
+
+
+	if (rasterOutputs.empty()) return;
+
+	/*
+	* Í¸ÊÓ»Ö¸´´¦Àí½×¶Î
+	* ×÷ÓÃ£º
+	*	ÀëÉ¢³öÀ´µÄÏñËØ²åÖµ½á¹û£¬ĞèÒª³ËÒÔ×ÔÉíµÄwÖµ»Ö¸´µ½Õı³£Ì¬
+	*/
+	for (auto& output : rasterOutputs) {
+		perspectiveRecover(output);
+	}
+
+	/*
+	* ÑÕÉ«Êä³ö´¦Àí½×¶Î
+	* ×÷ÓÃ£º
+	*	 ½«ÑÕÉ«½øĞĞÊä³ö
+	*/
+	FsOutput fsOutput;
+	uint32_t pixelPos = 0;
+	for (uint32_t i = 0; i < rasterOutputs.size(); ++i) {
+		mShader->fragmentShader(rasterOutputs[i], fsOutput, mTextureMap);
+		pixelPos = fsOutput.mPixelPos.y * mFrameBuffer->mWidth + fsOutput.mPixelPos.x;
+
+		//Éî¶È²âÊÔ
+		if (mEnableDepthTest && !depthTest(fsOutput)) {
+			continue;
+		}
+
+		RGBA color = fsOutput.mColor;
+		if (mEnableBlending) {
+			color = blend(fsOutput);
+		}
+
+		mFrameBuffer->mColorBuffer[pixelPos] = color;
+	}
+}
+
+void GPU::vertexShaderStage(
+	std::vector<VsOutput>& vsOutputs,
+	const VertexArrayObject* vao,
+	const BufferObject* ebo,
+	const uint32_t first,
+	const uint32_t count) {
+	auto bindingMap = vao->getBindingMap();
+	byte* indicesData = ebo->getBuffer();
+
+	uint32_t index = 0;
+	for (uint32_t i = first; i < first + count; ++i) {
+		//»ñÈ¡EboÖĞµÚi¸öindex
+		size_t indicesOffset = i * sizeof(uint32_t);
+		memcpy(&index, indicesData + indicesOffset, sizeof(uint32_t));
+
+		VsOutput output = mShader->vertexShader(bindingMap, mBufferMap, index);
+		vsOutputs.push_back(output);
+	}
+}
+
+void GPU::perspectiveDivision(VsOutput& vsOutput) {
+	vsOutput.mOneOverW = 1.0f / vsOutput.mPosition.w;
+
+	vsOutput.mPosition *= vsOutput.mOneOverW;
+	vsOutput.mPosition.w = 1.0f;
+
+	vsOutput.mColor *= vsOutput.mOneOverW;
+	vsOutput.mNormal *= vsOutput.mOneOverW;
+	vsOutput.mUV *= vsOutput.mOneOverW;
+
+	trim(vsOutput);
+}
+
+void GPU::perspectiveRecover(VsOutput& vsOutput) {
+	vsOutput.mColor /= vsOutput.mOneOverW;
+	vsOutput.mNormal /= vsOutput.mOneOverW;
+	vsOutput.mUV /= vsOutput.mOneOverW;
+}
+
+void GPU::screenMapping(VsOutput& vsOutput) {
+	vsOutput.mPosition = mScreenMatrix * vsOutput.mPosition;
+}
+
+void GPU::trim(VsOutput& vsOutput) {
+	//ĞŞ¼ôÃ«´Ì,±ß½çÇó½»µãµÄÊ±ºò£¬¿ÉÄÜ»á²úÉú³¬¹ı-1-1ÏÖÏó
+	if (vsOutput.mPosition.x < -1.0f) {
+		vsOutput.mPosition.x = -1.0f;
+	}
+
+	if (vsOutput.mPosition.x > 1.0f) {
+		vsOutput.mPosition.x = 1.0f;
+	}
+
+	if (vsOutput.mPosition.y < -1.0f) {
+		vsOutput.mPosition.y = -1.0f;
+	}
+
+	if (vsOutput.mPosition.y > 1.0f) {
+		vsOutput.mPosition.y = 1.0f;
+	}
+
+	if (vsOutput.mPosition.z < -1.0f) {
+		vsOutput.mPosition.z = -1.0f;
+	}
+
+	if (vsOutput.mPosition.z > 1.0f) {
+		vsOutput.mPosition.z = 1.0f;
+	}
+}
+
+bool GPU::depthTest(const FsOutput& output) {
+	uint32_t pixelPos = output.mPixelPos.y * mFrameBuffer->mWidth + output.mPixelPos.x;
+	float oldDepth = mFrameBuffer->mDepthBuffer[pixelPos];
+	switch (mDepthFunc)
+	{
+	case DEPTH_LESS:
+		if (output.mDepth < oldDepth) {
+			if (mEnableDepthWrite) {
+				mFrameBuffer->mDepthBuffer[pixelPos] = output.mDepth;
+			}
+			return true;
 		}
 		else {
-			resultColor = p.color;
+			return false;
 		}
+		break;
+	case DEPTH_GREATER:
+		if (output.mDepth > oldDepth) {
+			if (mEnableDepthWrite) {
+				mFrameBuffer->mDepthBuffer[pixelPos] = output.mDepth;
+			}
 
-
-		drawPoint(p.x, p.y, resultColor);
-	}
-}
-
-void GPU::drawImage(const Image* image) {
-	for (uint32_t i = 0; i < image->mWidth; ++i) {
-		for (uint32_t j = 0; j < image->mHeight; ++j) {
-			drawPoint(i, j, image->mData[j * image->mWidth + i]);
+			return true;
 		}
-	}
-}
-
-void GPU::drawImageWidthAlpha(const Image* image, const uint32_t& alpha) {
-	RGBA color;
-	for (uint32_t i = 0; i < image->mWidth; ++i) {
-		for (uint32_t j = 0; j < image->mHeight; ++j) {
-			color = image->mData[j * image->mWidth + i];
-			color.mA = alpha;
-			drawPoint(i, j, color);
+		else {
+			return false;
 		}
+		break;
+	default:
+		return false;
+		break;
 	}
 }
 
-
-//è®¾ç½®çŠ¶æ€
-void GPU::setBlending(bool enable) {
-	mEnableBlending = enable;
+void GPU::depthWrite(bool value) {
+	mEnableDepthWrite = value;
 }
 
-void GPU::setBilinear(bool enable) {
-	mEnableBilinear = enable;
-}
+RGBA GPU::blend(const FsOutput& output) {
+	RGBA result;
 
-void GPU::setTexture(Image* image) {
-	mImage = image;
-}
+	uint32_t pixelPos = output.mPixelPos.y * mFrameBuffer->mWidth + output.mPixelPos.x;
+	RGBA dst = mFrameBuffer->mColorBuffer[pixelPos];
+	RGBA src = output.mColor;
 
-void GPU::setTextureWrap(uint32_t wrap) {
-	mWrap = wrap;
-}
+	float weight = static_cast<float>(src.mA) / 255.0f;
 
-RGBA GPU::sampleNearest(const math::vec2f& uv) {
-	auto myUV = uv;
+	result.mR = static_cast<float>(src.mR) * weight + static_cast<float>(dst.mR) * (1.0f - weight);
+	result.mG = static_cast<float>(src.mG) * weight + static_cast<float>(dst.mG) * (1.0f - weight);
+	result.mB = static_cast<float>(src.mB) * weight + static_cast<float>(dst.mB) * (1.0f - weight);
+	result.mA = static_cast<float>(src.mA) * weight + static_cast<float>(dst.mA) * (1.0f - weight);
 
-	checkWrap(myUV.x);
-	checkWrap(myUV.y);
-
-	//å››èˆäº”å…¥åˆ°æœ€è¿‘æ•´æ•°
-	// u = 0 å¯¹åº” x = 0ï¼Œu = 1 å¯¹åº” x = width - 1
-	// v = 0 å¯¹åº” y = 0ï¼Œv = 1 å¯¹åº” y = height - 1
-	int x = std::round(myUV.x * (mImage->mWidth - 1));
-	int y = std::round(myUV.y * (mImage->mHeight - 1));
-
-	int position = y * mImage->mWidth + x;
-	return mImage->mData[position];
-}
-
-RGBA GPU::sampleBilinear(const math::vec2f& uv) {
-	RGBA resultColor;
-
-	auto myUV = uv;
-	checkWrap(myUV.x);
-	checkWrap(myUV.y);
-
-	float x = myUV.x * static_cast<float>(mImage->mWidth - 1);
-	float y = myUV.y * static_cast<float>(mImage->mHeight - 1);
-
-	int left = std::floor(x);
-	int right = std::ceil(x);
-	int bottom = std::floor(y);
-	int top = std::ceil(y);
-
-	//å¯¹ä¸Šä¸‹æ’å€¼ï¼Œå¾—åˆ°å·¦å³
-	float yScale = 0.0f;
-	if (top == bottom) {
-		yScale = 1.0f;
-	}
-	else {
-		yScale = (y - static_cast<float>(bottom)) / static_cast<float>(top - bottom);
-	}
-
-	int positionLeftTop = top * mImage->mWidth + left;
-	int positionLeftBottom = bottom * mImage->mWidth + left;
-	int positionRightTop = top * mImage->mWidth + right;
-	int positionRightBottom = bottom * mImage->mWidth + right;
-
-	RGBA leftColor = Raster::lerpRGBA(mImage->mData[positionLeftBottom], mImage->mData[positionLeftTop], yScale);
-	RGBA rightColor = Raster::lerpRGBA(mImage->mData[positionRightBottom], mImage->mData[positionRightTop], yScale);
-
-	//å¯¹å·¦å³æ’å€¼ï¼Œå¾—åˆ°ç»“æœ
-	float xScale = 0.0f;
-	if (right == left) {
-		xScale = 1.0f;
-	}
-	else {
-		xScale = (x - static_cast<float>(left)) / static_cast<float>(right - left);
-	}
-
-	resultColor = Raster::lerpRGBA(leftColor, rightColor, xScale);
-
-
-	return resultColor;
-}
-
-void GPU::checkWrap(float& n) {
-	if (n > 1.0f || n < 0.0f) {
-		n = FRACTION(n);
-		switch (mWrap) {
-		case TEXTURE_WRAP_REPEAT:
-			n = FRACTION(n + 1);
-			break;
-		case TEXTURE_WRAP_MIRROR:
-			n = 1.0f - FRACTION(n + 1);
-			break;
-		default:
-			break;
-		}
-	}
+	return result;
 }

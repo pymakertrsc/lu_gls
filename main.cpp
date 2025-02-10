@@ -2,134 +2,69 @@
 #include<iostream>
 #include "application/application.h"
 #include "gpu/gpu.h"
+#include "gpu/dataStructures.h"
+#include "gpu/shader/lightShader.h"
+#include "application/image.h"
+#include "application/camera.h"
+#include "application/model.h"
 
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup" )
 
-//Image* image01 = Image::createImage("assets/textures/sgs640.png");
-//Image* image02 = Image::createImage("assets/textures/Brick_Diffuse.jpg");
-//void render() {
-//	sgl->clear();
-//
-//	sgl->setBlending(true);
-//	sgl->drawImage(image02);
-//	sgl->drawImageWidthAlpha(image01, 100);
-//}
+uint32_t WIDTH = 1200;
+uint32_t HEIGHT = 900;
 
-Image* texture;
-Point p1;
-Point p2;
-Point p3;
-Point q1;
-Point q2;
-Point q3;
+Camera* camera = nullptr;
 
-//void render() {
-//	sgl->clear();
-//	sgl->setTexture(texture);
-//	sgl->drawTriangle(p1, p2, p3);
-//}
+//使用的Shader
+LightShader* shader = nullptr;
+DirectionalLight directionalLight;
+math::vec3f envLight;
 
-//void render() {
-//	sgl->clear();
-//	sgl->setTexture(texture);
-//
-//	sgl->setBilinear(false);
-//	sgl->drawTriangle(p1, p2, p3);
-//
-//	sgl->setBilinear(true);
-//	sgl->drawTriangle(q1, q2, q3);
-//}
-//
-//void prepare() {
-//	texture = Image::createImage("assets/textures/sgs640.png");
-//
-//	p1.x = 0;
-//	p1.y = 0;
-//	p1.color = RGBA(255, 0, 0, 255);
-//	p1.uv = math::vec2f(0.0f, 0.0f);
-//
-//	p2.x = 200;
-//	p2.y = 600;
-//	p2.color = RGBA(0, 255, 0, 255);
-//	p2.uv = math::vec2f(0.5f, 1.0f);
-//
-//	p3.x = 400;
-//	p3.y = 0;
-//	p3.color = RGBA(0, 0, 255, 255);
-//	p3.uv = math::vec2f(1.0f, 0.0f);
-//
-//	q1.x = 400;
-//	q1.y = 0;
-//	q1.color = RGBA(255, 0, 0, 255);
-//	q1.uv = math::vec2f(0.0f, 0.0f);
-//
-//	q2.x = 600;
-//	q2.y = 600;
-//	q2.color = RGBA(0, 255, 0, 255);
-//	q2.uv = math::vec2f(0.5f, 1.0f);
-//
-//	q3.x = 800;
-//	q3.y = 0;
-//	q3.color = RGBA(0, 0, 255, 255);
-//	q3.uv = math::vec2f(1.0f, 0.0f);
-//}
+//使用的模型
+Model* model = nullptr;
 
+float angle = 0;
+void transform() {
+	angle -= 0.02f;
+	auto rotateMatrix = math::rotate(math::mat4f(), angle, {0.0f,1.0f,0.0f});
+	auto translateMatrix = math::translate(math::mat4f(), 0.0f, 0.0f, -5.0f);
+	auto m = translateMatrix * rotateMatrix;
 
-float speed = 0.01;
-void changeUV() {
-	p1.uv.x += speed;
-	p2.uv.x += speed;
-	p3.uv.x += speed;
-	q1.uv.x += speed;
-	q2.uv.x += speed;
-	q3.uv.x += speed;
+	m = math::scale(m, 0.1f, 0.1f, 0.1f);
+	model->setModelMatrix(m);
 }
 
 void render() {
-	changeUV();
+	transform();
+
+	shader->mViewMatrix = camera->getViewMatrix();
+	shader->mProjectionMatrix = camera->getProjectionMatrix();
+
+	shader->mDirectionalLight = directionalLight;
+	shader->mEnvLight = envLight;
 
 	sgl->clear();
-	sgl->setTexture(texture);
-	sgl->setTextureWrap(TEXTURE_WRAP_MIRROR);
-
-	sgl->drawTriangle(p1, p2, p3);
-	sgl->drawTriangle(q1, q2, q3);
+	sgl->useProgram(shader);
+	model->draw(shader);
 }
 
 void prepare() {
-	texture = Image::createImage("assets/textures/sgs640.png");
+	camera = new Camera(60.0f, (float)WIDTH / (float)HEIGHT, 0.1f, 1000.0f, { 0.0f, 1.0f, 0.0f });
+	APP->setCamera(camera);
 
-	p1.x = 0;
-	p1.y = 0;
-	p1.color = RGBA(255, 0, 0, 255);
-	p1.uv = math::vec2f(0.0f, 0.0f);
+	shader = new LightShader();
+	directionalLight.color = {1.0f, 1.0f, 1.0f};
+	directionalLight.direction = {-1.0f, -0.5f, -0.7f};
+	envLight = { 0.5f, 0.5f, 0.5f };
 
-	p2.x = 400;
-	p2.y = 300;
-	p2.color = RGBA(0, 255, 0, 255);
-	p2.uv = math::vec2f(1.0f, 1.0f);
+	sgl->enable(CULL_FACE);
 
-	p3.x = 400;
-	p3.y = 0;
-	p3.color = RGBA(0, 0, 255, 255);
-	p3.uv = math::vec2f(1.0f, 0.0f);
+	model = new Model();
+	model->read("assets/model/dinosaur/source/Rampaging T-Rex.glb");
+	//model->read("assets/model/Fist Fight B.fbx");
+	//model->read("assets/model/bag/backpack.obj");
 
-	q1.x = 0;
-	q1.y = 0;
-	q1.color = RGBA(255, 0, 0, 255);
-	q1.uv = math::vec2f(0.0f, 0.0f);
-
-	q2.x = 0;
-	q2.y = 300;
-	q2.color = RGBA(0, 255, 0, 255);
-	q2.uv = math::vec2f(0.0f, 1.0f);
-
-	q3.x = 400;
-	q3.y = 300;
-	q3.color = RGBA(0, 0, 255, 255);
-	q3.uv = math::vec2f(1.0f, 1.0f);
 }
-
 
 int APIENTRY wWinMain(
 	_In_ HINSTANCE hInstance,		//本应用程序实例句柄，唯一指代当前程序
@@ -137,24 +72,26 @@ int APIENTRY wWinMain(
 	_In_ LPWSTR    lpCmdLine,		//应用程序运行参数
 	_In_ int       nCmdShow)		//窗口如何显示（最大化、最小化、隐藏），不需理会
 {
-	if (!app->initApplication(hInstance, 800, 600)) {
+	if (!APP->initApplication(hInstance, WIDTH, HEIGHT)) {
 		return -1;
 	}
 
 	//将bmp指向的内存配置到sgl当中 
-	sgl->initSurface(app->getWidth(), app->getHeight(), app->getCanvas());
+	sgl->initSurface(APP->getWidth(), APP->getHeight(), APP->getCanvas());
 
 	prepare();
 
 	bool alive = true;
 	while (alive) {
-		alive = app->peekMessage();
+		alive = APP->peekMessage();
+		camera->update();
+
 		render();
-		app->show();
+		APP->show();
 	}
 
-	Image::destroyImage(texture);
+	delete shader;
+	delete camera;
 
 	return 0;
 }
-

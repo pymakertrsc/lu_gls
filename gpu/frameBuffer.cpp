@@ -14,10 +14,16 @@ FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, void* buffer) {
 
 	mColorBuffer = (RGBA*)buffer;
 
+	mDepthBuffer = new float[width * height];
+	std::fill_n(mDepthBuffer, width * height, 1.0f);
 }
 
 FrameBuffer::~FrameBuffer() {
 	if (!mExternBuffer && mColorBuffer) {
 		delete[] mColorBuffer;
+	}
+
+	if (mDepthBuffer) {
+		delete[] mDepthBuffer;
 	}
 }

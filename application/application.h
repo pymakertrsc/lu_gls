@@ -1,8 +1,9 @@
 #pragma once
 #include "../global/base.h"
 #include<Windows.h>
+#include "camera.h"
 
-#define app Application::getInstance()
+#define APP Application::getInstance()
 
 class Application {
 public:
@@ -10,13 +11,13 @@ public:
 	Application();
 	~Application();
 
-	//æ³¨å†Œçª—ä½“ç±»ï¼Œåˆ›å»ºä¸€ä¸ªçª—ä½“ï¼Œæ˜¾ç¤º
+	//×¢²á´°ÌåÀà£¬´´½¨Ò»¸ö´°Ìå£¬ÏÔÊ¾
 	bool initApplication(HINSTANCE hInstance, const uint32_t& width = 800, const uint32_t& height = 600);
 
-	//æ‰˜ç®¡äº†wndProcæ•è·çš„æ¶ˆæ¯ï¼Œå¹¶ä¸”è¿›è¡Œå¤„ç†
+	//ÍĞ¹ÜÁËwndProc²¶»ñµÄÏûÏ¢£¬²¢ÇÒ½øĞĞ´¦Àí
 	void handleMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	//æ¯ä¸€å¸§/æ¯ä¸€æ¬¡å¾ªç¯ï¼Œéƒ½ä¼šè°ƒç”¨ï¼Œæ•è·ä»¥åŠåˆ†å‘çª—ä½“æ¶ˆæ¯
+	//Ã¿Ò»Ö¡/Ã¿Ò»´ÎÑ­»·£¬¶¼»áµ÷ÓÃ£¬²¶»ñÒÔ¼°·Ö·¢´°ÌåÏûÏ¢
 	bool peekMessage();
 
 	void show();
@@ -25,6 +26,8 @@ public:
 	uint32_t getHeight() const { return mHeight; }
 	void* getCanvas() const { return mCanvasBuffer; }
 
+	void setCamera(Camera* camera);
+
 private:
 	BOOL createWindow(HINSTANCE hInstance);
 	ATOM registerWindowClass(HINSTANCE hInstance);
@@ -32,6 +35,10 @@ private:
 private:
 	static Application* mInstance;
 
+	Camera* mCamera{ nullptr };
+
+	//Îªtrue±íÊ¾µ±Ç°´°ÌåÈÔÈ»ÔÚ¼ÌĞøÏÔÊ¾£¬³ÌĞòÒ»Ö±ÔÚÅÜ
+	//Îªfalse±íÊ¾´°ÌåÒÑ¾­±»ÃüÁî¹Ø±Õ£¬³ÌĞòĞèÒªÍË³ö
 	bool		mAlive{ true };
 
 	HINSTANCE	mWindowInst;
@@ -41,8 +48,8 @@ private:
 	int			mWidth = 800;
 	int			mHeight = 600;
 
-	HDC			mhDC;//å½“å‰çª—å£ä¸»dc
-	HDC			mCanvasDC;//åˆ›å»ºçš„äºmhDCç›¸å…¼å®¹çš„ç»˜å›¾ç”¨çš„dc
-	HBITMAP		mhBmp;//mCanvasDCå†…éƒ¨ç”Ÿæˆçš„bitmap
-	void*		mCanvasBuffer{ nullptr };//mhBmpå¯¹åº”çš„å†…å­˜èµ·å§‹ä½ç½®æŒ‡é’ˆ
+	HDC			mhDC;//µ±Ç°´°¿ÚÖ÷dc
+	HDC			mCanvasDC;//´´½¨µÄÓÚmhDCÏà¼æÈİµÄ»æÍ¼ÓÃµÄdc
+	HBITMAP		mhBmp;//mCanvasDCÄÚ²¿Éú³ÉµÄbitmap
+	void*		mCanvasBuffer{ nullptr };//mhBmp¶ÔÓ¦µÄÄÚ´æÆğÊ¼Î»ÖÃÖ¸Õë
 };

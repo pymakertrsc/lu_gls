@@ -21,11 +21,11 @@ Image* Image::createImage(const std::string& path) {
 	int picType = 0;
 	int width{ 0 }, height{ 0 };
 
-	//stbimageè¯»å…¥çš„å›¾ç‰‡,åŸç‚¹åœ¨å·¦ä¸Šè§’ï¼Œyè½´æ˜¯å‘ä¸‹ç”Ÿé•¿çš„
-	//æˆ‘æ–¹å›¾å½¢ç¨‹åºè®¤ä¸ºï¼Œå›¾ç‰‡åº”è¯¥æ˜¯å·¦ä¸‹è§’ä¸º0ï¼Œ0ï¼›æ•…éœ€è¦ç¿»è½¬yè½´
+	//stbimage¶ÁÈëµÄÍ¼Æ¬,Ô­µãÔÚ×óÉÏ½Ç£¬yÖáÊÇÏòÏÂÉú³¤µÄ
+	//ÎÒ·½Í¼ĞÎ³ÌĞòÈÏÎª£¬Í¼Æ¬Ó¦¸ÃÊÇ×óÏÂ½ÇÎª0£¬0£»¹ÊĞèÒª·­×ªyÖá
 	stbi_set_flip_vertically_on_load(true);
 
-	//ç”±äºæˆ‘ä»¬æ˜¯BGRAçš„æ ¼å¼ï¼Œå›¾ç‰‡æ˜¯RGBAçš„æ ¼å¼ï¼Œæ‰€ä»¥å¾—äº¤æ¢ä¸‹R&B
+	//ÓÉÓÚÎÒÃÇÊÇBGRAµÄ¸ñÊ½£¬Í¼Æ¬ÊÇRGBAµÄ¸ñÊ½£¬ËùÒÔµÃ½»»»ÏÂR&B
 	unsigned char* bits = stbi_load(path.c_str(), &width, &height, &picType, STBI_rgb_alpha);
 	for (int i = 0; i < width * height * 4; i += 4)
 	{
@@ -39,7 +39,40 @@ Image* Image::createImage(const std::string& path) {
 	stbi_image_free(bits);
 
 	return image;
+}
 
+Image* Image::createImageFromMemory(
+	const std::string& path,
+	unsigned char* dataIn,
+	uint32_t widthIn,
+	uint32_t heightIn
+) {
+	int picType = 0;
+	int width{ 0 }, height{ 0 };
+
+	//¼ÇÂ¼ÁËÕû¸öÊı¾İµÄ´óĞ¡
+	uint32_t dataInSize = 0;
+
+	//Ò»¸öfbxÄ£ĞÍÓĞ¿ÉÄÜ´ò°ü½øÀ´jpg£¬´øÓĞÑ¹Ëõ¸ñÊ½µÄÍ¼Æ¬Çé¿öÏÂ£¬height¿ÉÄÜÎª0£¬width¾Í´ú±íÁËÕû¸öÍ¼Æ¬µÄ´óĞ¡
+	if (!heightIn) {
+		dataInSize = widthIn;
+	}
+	else {
+		dataInSize = widthIn * heightIn;
+	}
+
+	//ÎÒÃÇÏÖÔÚÄÃµ½µÄdataIn£¬²¢²»ÊÇÕ¹¿ªµÄÎ»Í¼Êı¾İ£¬ÓĞ¿ÉÄÜÊÇÒ»¸öjpg pngµÈ¸ñÊ½µÄÍ¼Æ¬Êı¾İÁ÷
+	unsigned char* bits = stbi_load_from_memory(dataIn, dataInSize, &width, &height, &picType, STBI_rgb_alpha);
+	for (int i = 0; i < width * height * 4; i += 4)
+	{
+		byte tmp = bits[i];
+		bits[i] = bits[i + 2];
+		bits[i + 2] = tmp;
+	}
+
+	Image* image = new Image(width, height, (RGBA*)bits);
+
+	return image;
 }
 
 void Image::destroyImage(Image* image) {

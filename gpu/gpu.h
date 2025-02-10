@@ -2,14 +2,18 @@
 #include "../global/base.h"
 #include "frameBuffer.h"
 #include "../application/application.h"
-#include "../application/image.h"
 #include "../math/math.h"
+#include "dataStructures.h"
+#include "bufferObject.h"
+#include "vao.h"
+#include "shader.h"
+#include "texture.h"
 
 #define sgl GPU::getInstance()
 
 /*
-* class GPUï¼š
-* æ¨¡æ‹ŸGPUçš„ç»˜å›¾è¡Œä¸ºä»¥åŠç®—æ³•ç­‰
+* class GPU£º
+* Ä£ÄâGPUµÄ»æÍ¼ĞĞÎªÒÔ¼°Ëã·¨µÈ
 */
 class GPU {
 public:
@@ -18,46 +22,102 @@ public:
 
 	~GPU();
 
-	//æ¥å—å¤–ç•Œä¼ å…¥çš„bmpå¯¹åº”çš„å†…å­˜æŒ‡é’ˆä»¥åŠçª—ä½“çš„å®½/é«˜
+	//½ÓÊÜÍâ½ç´«ÈëµÄbmp¶ÔÓ¦µÄÄÚ´æÖ¸ÕëÒÔ¼°´°ÌåµÄ¿í/¸ß
 	void initSurface(const uint32_t& width, const uint32_t& height, void* buffer = nullptr);
 
-	//æ¸…é™¤ç”»å¸ƒå†…å®¹
+	//Çå³ı»­²¼ÄÚÈİ
 	void clear();
 
-	//ä¼ å…¥åƒç´ ä½ç½®ï¼Œç»˜åˆ¶æˆæŸç§é¢œè‰²
-	void drawPoint(const uint32_t& x, const uint32_t& y, const RGBA& color);
+	//´òÓ¡×´Ì¬»ú
+	void printVAO(const uint32_t& vaoID);
 
-	void drawLine(const Point& p1, const Point& p2);
+	uint32_t genBuffer();
+	void deleteBuffer(const uint32_t& bufferID);
+	void bindBuffer(const uint32_t& bufferType, const uint32_t& bufferID);
+	void bufferData(const uint32_t& bufferType, size_t dataSize, void* data);
 
-	void drawTriangle(const Point& p1, const Point& p2, const Point& p3);
+	uint32_t genVertexArray();
+	void deleteVertexArray(const uint32_t& vaoID);
+	void bindVertexArray(const uint32_t& vaoID);
+	void vertexAttributePointer(
+		const uint32_t& binding,
+		const uint32_t& itemSize,
+		const uint32_t& stride,
+		const uint32_t& offset);
 
-	void drawImage(const Image* image);
+	void useProgram(Shader* shader);
 
-	void drawImageWidthAlpha(const Image* image, const uint32_t& alpha);
+	void enable(const uint32_t& value);
+	void disable(const uint32_t& value);
 
-	//è®¾ç½®
-	void setBlending(bool enable);
+	//cull face
+	void frontFace(const uint32_t& value);
+	void cullFace(const uint32_t& value);
 
-	void setBilinear(bool enable);
+	//depth test
+	void depthFunc(const uint32_t& depthFunc);
+	void depthWrite(bool value);
 
-	void setTexture(Image* image);
+	//textures
+	uint32_t genTexture();
+	void deleteTexture(const uint32_t& texID);
+	void bindTexture(const uint32_t& texID);
+	void texImage2D(const uint32_t& width, const uint32_t& height, void* data);
+	void texParameter(const uint32_t& param, const uint32_t& value);
 
-	void setTextureWrap(uint32_t wrap);
+	void drawElement(const uint32_t& drawMode, const uint32_t& first, const uint32_t& count);
 
 private:
-	RGBA sampleNearest(const math::vec2f& uv);
-	RGBA sampleBilinear(const math::vec2f& uv);
-	void checkWrap(float& n);
+	void vertexShaderStage(
+		std::vector<VsOutput>& vsOutputs,
+		const VertexArrayObject* vao,
+		const BufferObject* ebo,
+		const uint32_t first,
+		const uint32_t count);
+
+	void perspectiveDivision(VsOutput& vsOutput);
+	void perspectiveRecover(VsOutput& vsOutput);
+	void screenMapping(VsOutput& vsOutput);
+
+	void trim(VsOutput& vsOutput);
+
+	bool depthTest(const FsOutput& output);
+
+	RGBA blend(const FsOutput& output);
 
 private:
 	static GPU* mInstance;
-
-	bool mEnableBlending{ false };
-	bool mEnableBilinear{ false };
-	uint32_t mWrap{ TEXTURE_WRAP_REPEAT };
-
 	FrameBuffer* mFrameBuffer{ nullptr };
 
-	//çº¹ç†è´´å›¾
-	Image* mImage{ nullptr };
+	//VBOÏà¹Ø/EBOÒ²´æÔÚÄÚ²¿
+	uint32_t mCurrentVBO{ 0 };
+	uint32_t mCurrentEBO{ 0 };
+	uint32_t mBufferCounter{ 0 };
+	std::map<uint32_t, BufferObject*> mBufferMap;
+
+	//VAOÏà¹Ø
+	uint32_t mCurrentVAO{ 0 };
+	uint32_t mVaoCounter{ 0 };
+	std::map<uint32_t, VertexArrayObject*> mVaoMap;
+
+	Shader* mShader{ nullptr };
+	math::mat4f mScreenMatrix;
+
+	//cull face
+	bool mEnableCullFace{ false };
+	uint32_t mFrontFace{ FRONT_FACE_CCW };
+	uint32_t mCullFace{ BACK_FACE };
+
+	//depth
+	bool mEnableDepthTest{ true };
+	bool mEnableDepthWrite{ true };
+	uint32_t mDepthFunc{ DEPTH_LESS };
+
+	//blending
+	bool mEnableBlending{ false };
+
+	//texture
+	uint32_t mCurrentTexture{ 0 };
+	uint32_t mTextureCounter{ 0 };
+	std::map<uint32_t, Texture*> mTextureMap;
 };
