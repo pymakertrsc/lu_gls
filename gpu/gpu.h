@@ -12,8 +12,8 @@
 #define sgl GPU::getInstance()
 
 /*
-* class GPU£º
-* Ä£ÄâGPUµÄ»æÍ¼ĞĞÎªÒÔ¼°Ëã·¨µÈ
+* class GPUï¼š
+* æ¨¡æ‹ŸGPUçš„ç»˜å›¾è¡Œä¸ºä»¥åŠç®—æ³•ç­‰
 */
 class GPU {
 public:
@@ -22,13 +22,13 @@ public:
 
 	~GPU();
 
-	//½ÓÊÜÍâ½ç´«ÈëµÄbmp¶ÔÓ¦µÄÄÚ´æÖ¸ÕëÒÔ¼°´°ÌåµÄ¿í/¸ß
+	//æ¥å—å¤–ç•Œä¼ å…¥çš„bmpå¯¹åº”çš„å†…å­˜æŒ‡é’ˆä»¥åŠçª—ä½“çš„å®½/é«˜
 	void initSurface(const uint32_t& width, const uint32_t& height, void* buffer = nullptr);
 
-	//Çå³ı»­²¼ÄÚÈİ
+	//æ¸…é™¤ç”»å¸ƒå†…å®¹
 	void clear();
 
-	//´òÓ¡×´Ì¬»ú
+	//æ‰“å°çŠ¶æ€æœº
 	void printVAO(const uint32_t& vaoID);
 
 	uint32_t genBuffer();
@@ -89,13 +89,13 @@ private:
 	static GPU* mInstance;
 	FrameBuffer* mFrameBuffer{ nullptr };
 
-	//VBOÏà¹Ø/EBOÒ²´æÔÚÄÚ²¿
+	//VBOç›¸å…³/EBOä¹Ÿå­˜åœ¨å†…éƒ¨
 	uint32_t mCurrentVBO{ 0 };
 	uint32_t mCurrentEBO{ 0 };
 	uint32_t mBufferCounter{ 0 };
 	std::map<uint32_t, BufferObject*> mBufferMap;
 
-	//VAOÏà¹Ø
+	//VAOç›¸å…³
 	uint32_t mCurrentVAO{ 0 };
 	uint32_t mVaoCounter{ 0 };
 	std::map<uint32_t, VertexArrayObject*> mVaoMap;

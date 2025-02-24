@@ -2,7 +2,7 @@
 #include "../math/math.h"
 
 void Clipper::doClipSpace(const uint32_t& drawMode, const std::vector<VsOutput>& primitives, std::vector<VsOutput>& outputs) {
-	//±£Ö¤Êä³öÎª¿Õ
+	//ä¿è¯è¾“å‡ºä¸ºç©º
 	outputs.clear();
 
 	if (drawMode == DRAW_TRIANGLES) {
@@ -22,7 +22,7 @@ void Clipper::doClipSpace(const uint32_t& drawMode, const std::vector<VsOutput>&
 				continue;
 			}
 
-			//½øĞĞÈı½ÇĞÎ·ì²¹
+			//è¿›è¡Œä¸‰è§’å½¢ç¼è¡¥
 			for (uint32_t c = 0; c < results.size() - 2; ++c) {
 				outputs.push_back(results[0]);
 				outputs.push_back(results[c + 1]);
@@ -80,50 +80,50 @@ void Clipper::sutherlandHodgman(const uint32_t& drawMode, const std::vector<VsOu
 	outputs = primitive;
 	std::vector<VsOutput> inputs;
 
-	//±éÀúÃ¿Ò»¸öÆ½Ãæ½øĞĞ¼ì²é
+	//éå†æ¯ä¸€ä¸ªå¹³é¢è¿›è¡Œæ£€æŸ¥
 	for (uint32_t i = 0; i < clipPlanes.size(); ++i) {
-		//ÓÃÉÏÒ»´ÎµÄÊä³ö×÷ÎªÊäÈëµã¼¯
+		//ç”¨ä¸Šä¸€æ¬¡çš„è¾“å‡ºä½œä¸ºè¾“å…¥ç‚¹é›†
 		inputs = outputs;
 		outputs.clear();
 
-		//±éÀúÊäÈëµÄÃ¿Ò»¸öµã
+		//éå†è¾“å…¥çš„æ¯ä¸€ä¸ªç‚¹
 		for (uint32_t p = 0; p < inputs.size(); ++p) {
-			//È¡³öµãP
+			//å–å‡ºç‚¹P
 			auto current = inputs[p];
-			//È¡³öµãS
+			//å–å‡ºç‚¹S
 			auto last = inputs[(p + inputs.size() - 1) % inputs.size()];
 
-			//1 ÅĞ¶¨PµãÔÚÄÚ²¿,¼´3/4Çé¿ö
+			//1 åˆ¤å®šPç‚¹åœ¨å†…éƒ¨,å³3/4æƒ…å†µ
 			if (inside(current.mPosition, clipPlanes[i])) {
-				//ÕâÀï¼ÓÁËÏŞÖÆÒòËØ£¬ÏßÌõÈç¹ûµ½ÁË×îºóÒ»¸ö¶¥µã£¬²»×¼»ØÍ·¼ÆËã½»µã
+				//è¿™é‡ŒåŠ äº†é™åˆ¶å› ç´ ï¼Œçº¿æ¡å¦‚æœåˆ°äº†æœ€åä¸€ä¸ªé¡¶ç‚¹ï¼Œä¸å‡†å›å¤´è®¡ç®—äº¤ç‚¹
 				if (drawMode != DRAW_LINES || p != inputs.size() - 1) {
 
-					//2 ÅĞ¶¨Sµã²»ÔÚÄÚ²¿£¬Çé¿ö3
+					//2 åˆ¤å®šSç‚¹ä¸åœ¨å†…éƒ¨ï¼Œæƒ…å†µ3
 					if (!inside(last.mPosition, clipPlanes[i])) {
-						//Çó½»µãI
+						//æ±‚äº¤ç‚¹I
 						auto intersectPoint = intersect(last, current, clipPlanes[i]);
 
-						//°´ÕÕÇé¿ö3Êä³öI
+						//æŒ‰ç…§æƒ…å†µ3è¾“å‡ºI
 						outputs.push_back(intersectPoint);
 					}
 				}
 				
-				//PµãÖ»ÒªÔÚÄÚ²¿£¬¶¼»áÊä³ö£¨Çé¿ö3/4£©
+				//Pç‚¹åªè¦åœ¨å†…éƒ¨ï¼Œéƒ½ä¼šè¾“å‡ºï¼ˆæƒ…å†µ3/4ï¼‰
 				outputs.push_back(current);
 			}
-			//Pµã²»ÔÚÄÚ²¿£¬¼´1/2Çé¿ö
+			//Pç‚¹ä¸åœ¨å†…éƒ¨ï¼Œå³1/2æƒ…å†µ
 			else {
-				// ÕâÀï¼ÓÁËÏŞÖÆÒòËØ£¬ÏßÌõÈç¹ûµ½ÁË×îºóÒ»¸ö¶¥µã£¬²»×¼»ØÍ·¼ÆËã½»µã
+				// è¿™é‡ŒåŠ äº†é™åˆ¶å› ç´ ï¼Œçº¿æ¡å¦‚æœåˆ°äº†æœ€åä¸€ä¸ªé¡¶ç‚¹ï¼Œä¸å‡†å›å¤´è®¡ç®—äº¤ç‚¹
 				if (drawMode != DRAW_LINES || p != inputs.size() - 1) {
 
-					//SµãÔÚÄÚ²¿,Çé¿ö2,Êä³ö½»µãI
+					//Sç‚¹åœ¨å†…éƒ¨,æƒ…å†µ2,è¾“å‡ºäº¤ç‚¹I
 					if (inside(last.mPosition, clipPlanes[i])) {
 						auto intersectPoint = intersect(last, current, clipPlanes[i]);
 						outputs.push_back(intersectPoint);
 					}
 				}
 
-				//Sµã²»ÔÚÄÚ²¿£¬Çé¿ö1£¬ÎŞÊä³ö
+				//Sç‚¹ä¸åœ¨å†…éƒ¨ï¼Œæƒ…å†µ1ï¼Œæ— è¾“å‡º
 				
 			}
 		}
@@ -134,7 +134,7 @@ bool Clipper::inside(const math::vec4f& point, const math::vec4f& plane) {
 	return math::dot(point, plane) > 0.0f;
 }
 
-//×¢Òâ£¬ÕâÀïÖ»ÄÜ²åÖµÎ»ÓÚÆ½ÃæÁ½²àµÄµã
+//æ³¨æ„ï¼Œè¿™é‡Œåªèƒ½æ’å€¼ä½äºå¹³é¢ä¸¤ä¾§çš„ç‚¹
 VsOutput Clipper::intersect(const VsOutput& last, const VsOutput& current, const math::vec4f& plane) {
 	VsOutput output;
 
@@ -162,25 +162,25 @@ bool Clipper::cullFace(
 
 	math::vec3f normal = math::cross(edge1, edge2);
 
-	//×¢Òâ£¬´ËÊ±NDC×ø±êÒÑ¾­Î»ÓÚÁË×óÊÖ×ø±êÏµÏÂ£¬²æ³ËĞèÒªÓÃ×óÊÖÀ´±È»®
+	//æ³¨æ„ï¼Œæ­¤æ—¶NDCåæ ‡å·²ç»ä½äºäº†å·¦æ‰‹åæ ‡ç³»ä¸‹ï¼Œå‰ä¹˜éœ€è¦ç”¨å·¦æ‰‹æ¥æ¯”åˆ’
 	if (cullFace == BACK_FACE) {
 
-		//ÔÚÄæÊ±ÕëÇé¿öÏÂ,Ê¹ÓÃ×óÊÖÊ¾Òâ£¬z>0Îªfront£¬±£Áô
+		//åœ¨é€†æ—¶é’ˆæƒ…å†µä¸‹,ä½¿ç”¨å·¦æ‰‹ç¤ºæ„ï¼Œz>0ä¸ºfrontï¼Œä¿ç•™
 		if (frontFace == FRONT_FACE_CCW) {
 			return normal.z > 0;
 		}
 		else {
-		//ÔÚË³Ê±ÕëÇé¿öÏÂ,Ê¹ÓÃ×óÊÖÊ¾Òâ£¬z<0Îªfront£¬±£Áô
+		//åœ¨é¡ºæ—¶é’ˆæƒ…å†µä¸‹,ä½¿ç”¨å·¦æ‰‹ç¤ºæ„ï¼Œz<0ä¸ºfrontï¼Œä¿ç•™
 			return normal.z < 0;
 		}
 	}
 	else {
-		//ÔÚÄæÊ±ÕëÇé¿öÏÂ,Ê¹ÓÃ×óÊÖÊ¾Òâ£¬z<0Îªback£¬±£Áô
+		//åœ¨é€†æ—¶é’ˆæƒ…å†µä¸‹,ä½¿ç”¨å·¦æ‰‹ç¤ºæ„ï¼Œz<0ä¸ºbackï¼Œä¿ç•™
 		if (frontFace == FRONT_FACE_CCW) {
 			return normal.z < 0;
 		}
 		else {
-		//ÔÚË³Ê±ÕëÇé¿öÏÂ,Ê¹ÓÃ×óÊÖÊ¾Òâ£¬z>0Îªback£¬±£Áô
+		//åœ¨é¡ºæ—¶é’ˆæƒ…å†µä¸‹,ä½¿ç”¨å·¦æ‰‹ç¤ºæ„ï¼Œz>0ä¸ºbackï¼Œä¿ç•™
 			return normal.z > 0;
 		}
 	}

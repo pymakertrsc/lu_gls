@@ -2,7 +2,7 @@
 #include "../global/base.h"
 #include "../math/math.h"
 
-//VAOÖ®ÖĞ£¬ÓÃÓÚÃèÊöÊôĞÔ¶ÁÈ¡·½Ê½µÄDescription
+//VAOä¹‹ä¸­ï¼Œç”¨äºæè¿°å±æ€§è¯»å–æ–¹å¼çš„Description
 struct BindingDescription {
 	uint32_t	mVboId{ 0 };
 	size_t		mItemSize{ 0 };
@@ -13,7 +13,7 @@ struct BindingDescription {
 struct VsOutput {
 	float mOneOverW{ 0.0f };
 	math::vec4f mPosition{ 0.0f, 0.0f, 0.0f, 1.0f };
-	math::vec4f mColor;//´Ë´¦ÑÕÉ«¸ÄÎª0.0-1.0Ö®¼ä±í´ï0-255µÄÁ¿
+	math::vec4f mColor;//æ­¤å¤„é¢œè‰²æ”¹ä¸º0.0-1.0ä¹‹é—´è¡¨è¾¾0-255çš„é‡
 	math::vec3f mNormal;
 	math::vec2f mUV;
 };
@@ -21,5 +21,5 @@ struct VsOutput {
 struct FsOutput {
 	math::vec2i mPixelPos;
 	float mDepth;
-	RGBA mColor;//´Ë´¦Ê¹ÓÃ0-255À´½øĞĞÑÕÉ«ÏÔÊ¾
+	RGBA mColor;//æ­¤å¤„ä½¿ç”¨0-255æ¥è¿›è¡Œé¢œè‰²æ˜¾ç¤º
 };

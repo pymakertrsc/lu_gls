@@ -100,7 +100,7 @@ void Camera::yaw(int xoffset) {
 }
 
 void Camera::update() {
-	//将各个方向的可能进行汇总，得到一个最终移动方向
+	
 	math::vec3f moveDirection = {0.0f, 0.0f, 0.0f};
 
 	math::vec3f front = mFront;

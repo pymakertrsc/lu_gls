@@ -11,10 +11,10 @@ VsOutput TextureShader::vertexShader(
 ) {
 	VsOutput output;
 
-	//È¡³öAttributeÊıÖµ
+	//å–å‡ºAttributeæ•°å€¼
 	math::vec4f position = getVector(bindingMap, bufferMap, 0, index);
 
-	//±ä»¯ÎªÆë´Î×ø±ê 
+	//å˜åŒ–ä¸ºé½æ¬¡åæ ‡ 
 	position.w = 1.0f;
 	math::vec4f color = getVector(bindingMap, bufferMap, 1, index);
 
@@ -32,11 +32,11 @@ void TextureShader::fragmentShader(const VsOutput& input, FsOutput& output, cons
 	output.mPixelPos.y = static_cast<int>(input.mPosition.y);
 	output.mDepth = input.mPosition.z;
 
-	//È¡³ötexture
+	//å–å‡ºtexture
 	auto iter = textures.find(mDiffuseTexture);
 	auto texture = iter->second;
 
-	//¼ÆËãÑÕÉ«
+	//è®¡ç®—é¢œè‰²
 	math::vec4f diffuseColor = texture->getColor(input.mUV.x, input.mUV.y);
 	output.mColor = vectorToRGBA(diffuseColor);
 }

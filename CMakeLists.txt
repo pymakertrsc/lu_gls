@@ -14,6 +14,7 @@ include_directories(
 	SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/include
 )
 
+
 link_directories(
 	SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/lib/assimp
 )

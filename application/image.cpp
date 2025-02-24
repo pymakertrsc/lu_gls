@@ -21,11 +21,9 @@ Image* Image::createImage(const std::string& path) {
 	int picType = 0;
 	int width{ 0 }, height{ 0 };
 
-	//stbimage¶ÁÈëµÄÍ¼Æ¬,Ô­µãÔÚ×óÉÏ½Ç£¬yÖáÊÇÏòÏÂÉú³¤µÄ
-	//ÎÒ·½Í¼ĞÎ³ÌĞòÈÏÎª£¬Í¼Æ¬Ó¦¸ÃÊÇ×óÏÂ½ÇÎª0£¬0£»¹ÊĞèÒª·­×ªyÖá
+
 	stbi_set_flip_vertically_on_load(true);
 
-	//ÓÉÓÚÎÒÃÇÊÇBGRAµÄ¸ñÊ½£¬Í¼Æ¬ÊÇRGBAµÄ¸ñÊ½£¬ËùÒÔµÃ½»»»ÏÂR&B
 	unsigned char* bits = stbi_load(path.c_str(), &width, &height, &picType, STBI_rgb_alpha);
 	for (int i = 0; i < width * height * 4; i += 4)
 	{
@@ -50,10 +48,10 @@ Image* Image::createImageFromMemory(
 	int picType = 0;
 	int width{ 0 }, height{ 0 };
 
-	//¼ÇÂ¼ÁËÕû¸öÊı¾İµÄ´óĞ¡
+	//è®°å½•äº†æ•´ä¸ªæ•°æ®çš„å¤§å°
 	uint32_t dataInSize = 0;
 
-	//Ò»¸öfbxÄ£ĞÍÓĞ¿ÉÄÜ´ò°ü½øÀ´jpg£¬´øÓĞÑ¹Ëõ¸ñÊ½µÄÍ¼Æ¬Çé¿öÏÂ£¬height¿ÉÄÜÎª0£¬width¾Í´ú±íÁËÕû¸öÍ¼Æ¬µÄ´óĞ¡
+	//ä¸€ä¸ªfbxæ¨¡å‹æœ‰å¯èƒ½æ‰“åŒ…è¿›æ¥jpgï¼Œå¸¦æœ‰å‹ç¼©æ ¼å¼çš„å›¾ç‰‡æƒ…å†µä¸‹ï¼Œheightå¯èƒ½ä¸º0ï¼Œwidthå°±ä»£è¡¨äº†æ•´ä¸ªå›¾ç‰‡çš„å¤§å°
 	if (!heightIn) {
 		dataInSize = widthIn;
 	}
@@ -61,7 +59,7 @@ Image* Image::createImageFromMemory(
 		dataInSize = widthIn * heightIn;
 	}
 
-	//ÎÒÃÇÏÖÔÚÄÃµ½µÄdataIn£¬²¢²»ÊÇÕ¹¿ªµÄÎ»Í¼Êı¾İ£¬ÓĞ¿ÉÄÜÊÇÒ»¸öjpg pngµÈ¸ñÊ½µÄÍ¼Æ¬Êı¾İÁ÷
+	//æˆ‘ä»¬ç°åœ¨æ‹¿åˆ°çš„dataInï¼Œå¹¶ä¸æ˜¯å±•å¼€çš„ä½å›¾æ•°æ®ï¼Œæœ‰å¯èƒ½æ˜¯ä¸€ä¸ªjpg pngç­‰æ ¼å¼çš„å›¾ç‰‡æ•°æ®æµ
 	unsigned char* bits = stbi_load_from_memory(dataIn, dataInSize, &width, &height, &picType, STBI_rgb_alpha);
 	for (int i = 0; i < width * height * 4; i += 4)
 	{

@@ -15,6 +15,5 @@ public:
 	void print();
 
 private:
-	//key:bindingId - value:bindingDescription
 	std::map<uint32_t, BindingDescription> mBindingMap;
 };

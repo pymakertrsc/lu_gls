@@ -8,9 +8,6 @@
 #define MOVE_FRONT 0x004
 #define MOVE_BACK 0x008
 
-//1 接收到外部操作（鼠标/键盘）
-//2 根据操作更改当前状态（移动状态/front向量）
-//3 每一帧由用户主动调用update，更新viewMatrix矩阵
 
 class Camera {
 public:

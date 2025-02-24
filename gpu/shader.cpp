@@ -6,7 +6,7 @@ math::vec4f Shader::getVector(
 	const uint32_t& attributeLocation,
 	const uint32_t& index) {
 
-	//1 È¡³ö±¾ÊôĞÔµÄDescription
+	//1 å–å‡ºæœ¬å±æ€§çš„Description
 	auto bindingIter = bindingMap.find(attributeLocation);
 	if (bindingIter == bindingMap.end()) {
 		assert(false);
@@ -14,7 +14,7 @@ math::vec4f Shader::getVector(
 
 	auto bindingDescription = bindingIter->second;
 
-	//2 È¡³ö±¾ÊôĞÔËùÔÚµÄvbo
+	//2 å–å‡ºæœ¬å±æ€§æ‰€åœ¨çš„vbo
 	auto vboID = bindingDescription.mVboId;
 	auto vboIter = bufferMap.find(vboID);
 	if (vboIter == bufferMap.end()) {
@@ -23,7 +23,7 @@ math::vec4f Shader::getVector(
 
 	BufferObject* vbo = vboIter->second;
 
-	//3 ¼ÆËãÊı¾İÔÚvboÖĞµÄÆ«ÒÆÁ¿
+	//3 è®¡ç®—æ•°æ®åœ¨vboä¸­çš„åç§»é‡
 	uint32_t dataOffset = bindingDescription.mStride * index + bindingDescription.mOffset;
 	uint32_t dataSize = bindingDescription.mItemSize * sizeof(float);
 
@@ -31,7 +31,7 @@ math::vec4f Shader::getVector(
 
 	math::vec4f result;
 
-	//¿½±´³öĞèÒªµÄÊı¾İ£¬×î¶à4¸öfloat
+	//æ‹·è´å‡ºéœ€è¦çš„æ•°æ®ï¼Œæœ€å¤š4ä¸ªfloat
 	memcpy(&result, buffer, dataSize);
 
 	return result;

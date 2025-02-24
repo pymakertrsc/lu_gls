@@ -6,7 +6,7 @@ Mesh::Mesh(
 	const std::vector<unsigned int> indices,
 	uint32_t diffuseTexture,
 	const math::mat4f& localMatrix) {
-	//ÖÁÉÙ×÷ÎªÒ»¸ö½Úµã
+	//è‡³å°‘ä½œä¸ºä¸€ä¸ªèŠ‚ç‚¹
 	mLocalMatrix = localMatrix;
 	mTexture = diffuseTexture;
 
@@ -89,7 +89,7 @@ void Model::read(const std::string& path) {
 	std::size_t lastIndex = path.find_last_of("//");
 	mRootPath = path.substr(0, lastIndex + 1);
 
-	//¿ªÊ¼½øĞĞ¶ÁÈ¡
+	//å¼€å§‹è¿›è¡Œè¯»å–
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(
 		path,
@@ -114,13 +114,13 @@ void Model::setModelMatrix(const math::mat4f& m) {
 }
 
 void Model::processNode(Mesh* parent, aiNode* ainode, const aiScene* scene) {
-	//´´½¨ĞÂ½Úµã
+	//åˆ›å»ºæ–°èŠ‚ç‚¹
 	auto node = new Mesh({}, {}, 0, math::mat4f());
 	parent->addChild(node);
 
 	node->mLocalMatrix = getMat4f(ainode->mTransformation);
 
-	// ´¦Àí½ÚµãËùÓĞµÄÍø¸ñ£¨Èç¹ûÓĞµÄ»°£©,¹ÒÔØµ½±¾nodeÏÂ
+	// å¤„ç†èŠ‚ç‚¹æ‰€æœ‰çš„ç½‘æ ¼ï¼ˆå¦‚æœæœ‰çš„è¯ï¼‰,æŒ‚è½½åˆ°æœ¬nodeä¸‹
 	for (unsigned int i = 0; i < ainode->mNumMeshes; i++)
 	{
 		aiMesh* aimesh = scene->mMeshes[ainode->mMeshes[i]];
@@ -129,7 +129,7 @@ void Model::processNode(Mesh* parent, aiNode* ainode, const aiScene* scene) {
 		node->addChild(mesh);
 	}
 
-	// ½ÓÏÂÀ´¶ÔËüµÄ×Ó½ÚµãÖØ¸´ÕâÒ»¹ı³Ì
+	// æ¥ä¸‹æ¥å¯¹å®ƒçš„å­èŠ‚ç‚¹é‡å¤è¿™ä¸€è¿‡ç¨‹
 	for (unsigned int i = 0; i < ainode->mNumChildren; i++)
 	{
 		processNode(node, ainode->mChildren[i], scene);
@@ -144,7 +144,7 @@ Mesh* Model::processMesh(aiMesh* aimesh, const aiScene* scene) {
 	for (unsigned int i = 0; i < aimesh->mNumVertices; i++)
 	{
 		Vertex vertex;
-		// ´¦Àí¶¥µãÎ»ÖÃ¡¢·¨ÏßºÍÎÆÀí×ø±ê
+		// å¤„ç†é¡¶ç‚¹ä½ç½®ã€æ³•çº¿å’Œçº¹ç†åæ ‡
 		math::vec3f vector;
 		vector.x = aimesh->mVertices[i].x;
 		vector.y = aimesh->mVertices[i].y;
@@ -156,7 +156,7 @@ Mesh* Model::processMesh(aiMesh* aimesh, const aiScene* scene) {
 		vector.z = aimesh->mNormals[i].z;
 		vertex.normal = vector;
 
-		if (aimesh->mTextureCoords[0]) // Íø¸ñÊÇ·ñÓĞÎÆÀí×ø±ê£¿
+		if (aimesh->mTextureCoords[0]) // ç½‘æ ¼æ˜¯å¦æœ‰çº¹ç†åæ ‡ï¼Ÿ
 		{
 			math::vec2f vec;
 			vec.x = aimesh->mTextureCoords[0][i].x;
@@ -168,7 +168,7 @@ Mesh* Model::processMesh(aiMesh* aimesh, const aiScene* scene) {
 
 		vertices.push_back(vertex);
 	}
-	// ´¦ÀíË÷Òı
+	// å¤„ç†ç´¢å¼•
 	for (unsigned int i = 0; i < aimesh->mNumFaces; i++)
 	{
 		aiFace face = aimesh->mFaces[i];
@@ -177,12 +177,12 @@ Mesh* Model::processMesh(aiMesh* aimesh, const aiScene* scene) {
 	}
 	if (aimesh->mMaterialIndex >= 0)
 	{
-		//È¡³ö²ÄÖÊ
+		//å–å‡ºæè´¨
 		aiMaterial* material = scene->mMaterials[aimesh->mMaterialIndex];
 		diffuseTexture = processTexture(material, aiTextureType_DIFFUSE, scene);
 	}
 
-	//ÆäÉÏ·½ÒÑ¾­ÓµÓĞÁËparentNode£¬²»ĞèÒª×Ô¼ºµÄlocalMatrix
+	//å…¶ä¸Šæ–¹å·²ç»æ‹¥æœ‰äº†parentNodeï¼Œä¸éœ€è¦è‡ªå·±çš„localMatrix
 	return new Mesh(vertices, indices, diffuseTexture, math::mat4f());
 }
 
@@ -202,17 +202,17 @@ uint32_t Model::processTexture(
 		return 0;
 	}
 
-	//ÏÈ¼ì²é»º´æÊÇ·ñÓĞÎÆÀí
+	//å…ˆæ£€æŸ¥ç¼“å­˜æ˜¯å¦æœ‰çº¹ç†
 	auto iter = mTextureCache.find(std::string(aiPath.C_Str()));
 	if (iter != mTextureCache.end()) {
 		return iter->second;
 	}
 
-	//²¿·ÖÄ£ĞÍÔÚµ¼³öµÄÊ±ºò£¬»á°ÑÎÆÀíÍ¼Æ¬´ò°üµ½±ÈÈçfbx¸ñÊ½µ±ÖĞ£¬±»´ò°üµ½Ä£ĞÍÀïÃæµÄÍ¼Æ¬£¬³ÆÎªembeddedTexture 
+	//éƒ¨åˆ†æ¨¡å‹åœ¨å¯¼å‡ºçš„æ—¶å€™ï¼Œä¼šæŠŠçº¹ç†å›¾ç‰‡æ‰“åŒ…åˆ°æ¯”å¦‚fbxæ ¼å¼å½“ä¸­ï¼Œè¢«æ‰“åŒ…åˆ°æ¨¡å‹é‡Œé¢çš„å›¾ç‰‡ï¼Œç§°ä¸ºembeddedTexture 
 	const aiTexture* assimpTexture = scene->GetEmbeddedTexture(aiPath.C_Str());
 
 	if (assimpTexture) {
-		//Èç¹ûÈ·ÊµÍ¼Æ¬´ò°üÔÚÁËÄ£ĞÍÄÚ²¿£¬ÔòÉÏÊö´úÂë»ñÈ¡µ½µÄaiTextureÀïÃæ¾Íº¬ÓĞÁËÍ¼Æ¬Êı¾İ
+		//å¦‚æœç¡®å®å›¾ç‰‡æ‰“åŒ…åœ¨äº†æ¨¡å‹å†…éƒ¨ï¼Œåˆ™ä¸Šè¿°ä»£ç è·å–åˆ°çš„aiTextureé‡Œé¢å°±å«æœ‰äº†å›¾ç‰‡æ•°æ®
 		unsigned char* dataIn = reinterpret_cast<unsigned char*>(assimpTexture->pcData);
 		uint32_t widthIn = assimpTexture->mWidth;
 		uint32_t heightIn = assimpTexture->mHeight;

@@ -2,14 +2,14 @@
 #include "../global/base.h"
 
 /*
-* class FrameBuffer£º
-* ´æ´¢µ±Ç°»­²¼¶ÔÓ¦µÄbmpµÄÄÚ´æÖ¸Õë£¬×÷Îªµ±Ç°»æÍ¼»­°å
+* class FrameBufferï¼š
+* å­˜å‚¨å½“å‰ç”»å¸ƒå¯¹åº”çš„bmpçš„å†…å­˜æŒ‡é’ˆï¼Œä½œä¸ºå½“å‰ç»˜å›¾ç”»æ¿
 */
 class FrameBuffer {
 public:
 	FrameBuffer(uint32_t width, uint32_t height, void* buffer = nullptr);
 	~FrameBuffer();
-	FrameBuffer(const FrameBuffer&) = delete;//²»×¼¿½±´¸´ÖÆ
+	FrameBuffer(const FrameBuffer&) = delete;//ä¸å‡†æ‹·è´å¤åˆ¶
 
 	uint32_t	mWidth{ 0 };
 	uint32_t	mHeight{ 0 };

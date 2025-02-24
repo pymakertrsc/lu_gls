@@ -19,7 +19,7 @@ namespace math {
 		Vector2(const Vector4<T>& v) :x(v.x), y(v.y) {}
 
 		/*
-		* È¡µÃÏòÁ¿Ä³¸öÔªËØ
+		* å–å¾—å‘é‡æŸä¸ªå…ƒç´ 
 		* int a = v[1]
 		*/
 		T operator[](int i) const {
@@ -31,7 +31,7 @@ namespace math {
 		}
 
 		/*
-		* ¸øÏòÁ¿Ä³¸öÔªËØ¸³Öµ
+		* ç»™å‘é‡æŸä¸ªå…ƒç´ èµ‹å€¼
 		* v[1]=6
 		*/
 		T& operator[](int i) {
@@ -42,7 +42,7 @@ namespace math {
 			return y;
 		}
 
-		//µÈºÅÔËËã·ûÖØÔØ
+		//ç­‰å·è¿ç®—ç¬¦é‡è½½
 		Vector2<T> operator=(const Vector3<T>& v) {
 			x = v.x; y = v.y;
 			return *this;
@@ -54,7 +54,7 @@ namespace math {
 		}
 
 		/*
-		* ¼Ó·¨
+		* åŠ æ³•
 		* v = v1+v2
 		*/
 		Vector2<T> operator+(const Vector2<T>& v) const {
@@ -62,7 +62,7 @@ namespace math {
 		}
 
 		/*
-		* ¼Ó·¨²¢¸³Öµ
+		* åŠ æ³•å¹¶èµ‹å€¼
 		* v += v2
 		*/
 		Vector2<T> operator+=(const Vector2<T>& v) {
@@ -71,7 +71,7 @@ namespace math {
 		}
 
 		/*
-		* ³Ë·¨
+		* ä¹˜æ³•
 		* v = v1 * s
 		*/
 		Vector2<T> operator*(T s) const {
@@ -79,7 +79,7 @@ namespace math {
 		}
 
 		/*
-		* ³Ë·¨²¢¸³Öµ
+		* ä¹˜æ³•å¹¶èµ‹å€¼
 		* v *= s
 		*/
 		Vector2<T> operator*=(T s) {
@@ -88,7 +88,7 @@ namespace math {
 		}
 
 		/*
-		* ³ı·¨
+		* é™¤æ³•
 		* v = v1 / f
 		*/
 		Vector2<T> operator/(T f) const {
@@ -98,7 +98,7 @@ namespace math {
 		}
 
 		/*
-		* ³ı·¨²¢¸³Öµ
+		* é™¤æ³•å¹¶èµ‹å€¼
 		* v /= f
 		*/
 		Vector2<T> operator/=(T f) {
@@ -109,7 +109,7 @@ namespace math {
 		}
 
 		/*
-		* ¸ººÅ²Ù×÷
+		* è´Ÿå·æ“ä½œ
 		* v = -v1
 		*/
 		Vector2<T> operator-() {

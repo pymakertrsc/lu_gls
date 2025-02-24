@@ -84,13 +84,7 @@ BOOL Application::createWindow(HINSTANCE hInstance)
 {
 	mWindowInst = hInstance;
 
-	/*
-	* WS_POPUP:不需要标题栏，则不需要边框
-	* WS_OVERLAPPEDWINDOW：拥有普通程序主窗口的所有特点，必须有标题且有边框
-	*
-	* WS_CLIPSIBLINGS:被兄弟窗口挡住区域不绘制
-	* WS_CLIPCHILDREN:被子窗口遮挡住的区域不绘制
-	*/
+
 
 	auto dwExStyle = WS_EX_APPWINDOW;
 	auto dwStyle = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;

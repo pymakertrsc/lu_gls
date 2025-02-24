@@ -263,10 +263,10 @@ void GPU::drawElement(const uint32_t& drawMode, const uint32_t& first, const uin
 	const BufferObject* ebo = eboIter->second;
 
 	/*
-	* VertexShader´¦Àí½×¶Î
-	* ×÷ÓÃ£º
-	*	°´ÕÕÊäÈëµÄEboµÄindexË³ĞòÀ´´¦Àí¶¥µã£¬ÒÀ´ÎÍ¨¹ıvsShader£¬
-		µÃµ½µÄÊä³ö½á¹û°´Ğò·ÅÈëvsOutputsÖĞ
+	* VertexShaderå¤„ç†é˜¶æ®µ
+	* ä½œç”¨ï¼š
+	*	æŒ‰ç…§è¾“å…¥çš„Eboçš„indexé¡ºåºæ¥å¤„ç†é¡¶ç‚¹ï¼Œä¾æ¬¡é€šè¿‡vsShaderï¼Œ
+		å¾—åˆ°çš„è¾“å‡ºç»“æœæŒ‰åºæ”¾å…¥vsOutputsä¸­
 	*/
 	std::vector<VsOutput> vsOutputs{};
 	vertexShaderStage(vsOutputs, vao, ebo, first, count);
@@ -274,9 +274,9 @@ void GPU::drawElement(const uint32_t& drawMode, const uint32_t& first, const uin
 	if (vsOutputs.empty()) return;
 
 	/*
-	* Clip Space´¦Àí½×¶Î
-	* ×÷ÓÃ£º
-	*	ÔÚ¼ô²Ã¿Õ¼ä£¬¶ÔËùÓĞÊä³öµÄÍ¼Ôª½øĞĞ¼ô²ÃÆ´½ÓµÈ
+	* Clip Spaceå¤„ç†é˜¶æ®µ
+	* ä½œç”¨ï¼š
+	*	åœ¨å‰ªè£ç©ºé—´ï¼Œå¯¹æ‰€æœ‰è¾“å‡ºçš„å›¾å…ƒè¿›è¡Œå‰ªè£æ‹¼æ¥ç­‰
 	*/
 	std::vector<VsOutput> clipOutputs{};
 	Clipper::doClipSpace(drawMode, vsOutputs, clipOutputs);
@@ -285,18 +285,18 @@ void GPU::drawElement(const uint32_t& drawMode, const uint32_t& first, const uin
 	vsOutputs.clear();
 
 	/*
-	* NDC´¦Àí½×¶Î
-	* ×÷ÓÃ£º
-	*	½«¶¥µã×ª»¯µ½NDCÏÂ
+	* NDCå¤„ç†é˜¶æ®µ
+	* ä½œç”¨ï¼š
+	*	å°†é¡¶ç‚¹è½¬åŒ–åˆ°NDCä¸‹
 	*/
 	for (auto& output : clipOutputs) {
 		perspectiveDivision(output);
 	}
 
 	/*
-	* ±³ÃæÌŞ³ı½×¶Î
-	* ×÷ÓÃ£º
-	*	±³ÏòÎÒÃÇµÄÈı½ÇĞÎĞèÒªÌŞ³ı
+	* èƒŒé¢å‰”é™¤é˜¶æ®µ
+	* ä½œç”¨ï¼š
+	*	èƒŒå‘æˆ‘ä»¬çš„ä¸‰è§’å½¢éœ€è¦å‰”é™¤
 	*/
 	std::vector<VsOutput> cullOutputs = clipOutputs;
 	if (drawMode == DRAW_TRIANGLES && mEnableCullFace) {
@@ -311,18 +311,18 @@ void GPU::drawElement(const uint32_t& drawMode, const uint32_t& first, const uin
 	}
 	//clipOutputs.clear();
 	/*
-	* ÆÁÄ»Ó³Éä´¦Àí½×¶Î
-	* ×÷ÓÃ£º
-	*	½«NDCÏÂµÄµã£¬Í¨¹ıscreenMatrix£¬×ª»¯µ½ÆÁÄ»¿Õ¼ä
+	* å±å¹•æ˜ å°„å¤„ç†é˜¶æ®µ
+	* ä½œç”¨ï¼š
+	*	å°†NDCä¸‹çš„ç‚¹ï¼Œé€šè¿‡screenMatrixï¼Œè½¬åŒ–åˆ°å±å¹•ç©ºé—´
 	*/
 	for (auto& output : cullOutputs) {
 		screenMapping(output);
 	}
 
 	/*
-	* ¹âÕ¤»¯´¦Àí½×¶Î
-	* ×÷ÓÃ£º
-	*	ÀëÉ¢³öËùÓĞĞèÒªµÄFragment
+	* å…‰æ …åŒ–å¤„ç†é˜¶æ®µ
+	* ä½œç”¨ï¼š
+	*	ç¦»æ•£å‡ºæ‰€æœ‰éœ€è¦çš„Fragment
 	*/
 	std::vector<VsOutput> rasterOutputs;
 	Raster::rasterize(rasterOutputs, drawMode, cullOutputs);
@@ -331,18 +331,18 @@ void GPU::drawElement(const uint32_t& drawMode, const uint32_t& first, const uin
 	if (rasterOutputs.empty()) return;
 
 	/*
-	* Í¸ÊÓ»Ö¸´´¦Àí½×¶Î
-	* ×÷ÓÃ£º
-	*	ÀëÉ¢³öÀ´µÄÏñËØ²åÖµ½á¹û£¬ĞèÒª³ËÒÔ×ÔÉíµÄwÖµ»Ö¸´µ½Õı³£Ì¬
+	* é€è§†æ¢å¤å¤„ç†é˜¶æ®µ
+	* ä½œç”¨ï¼š
+	*	ç¦»æ•£å‡ºæ¥çš„åƒç´ æ’å€¼ç»“æœï¼Œéœ€è¦ä¹˜ä»¥è‡ªèº«çš„wå€¼æ¢å¤åˆ°æ­£å¸¸æ€
 	*/
 	for (auto& output : rasterOutputs) {
 		perspectiveRecover(output);
 	}
 
 	/*
-	* ÑÕÉ«Êä³ö´¦Àí½×¶Î
-	* ×÷ÓÃ£º
-	*	 ½«ÑÕÉ«½øĞĞÊä³ö
+	* é¢œè‰²è¾“å‡ºå¤„ç†é˜¶æ®µ
+	* ä½œç”¨ï¼š
+	*	 å°†é¢œè‰²è¿›è¡Œè¾“å‡º
 	*/
 	FsOutput fsOutput;
 	uint32_t pixelPos = 0;
@@ -350,7 +350,7 @@ void GPU::drawElement(const uint32_t& drawMode, const uint32_t& first, const uin
 		mShader->fragmentShader(rasterOutputs[i], fsOutput, mTextureMap);
 		pixelPos = fsOutput.mPixelPos.y * mFrameBuffer->mWidth + fsOutput.mPixelPos.x;
 
-		//Éî¶È²âÊÔ
+		//æ·±åº¦æµ‹è¯•
 		if (mEnableDepthTest && !depthTest(fsOutput)) {
 			continue;
 		}
@@ -375,7 +375,7 @@ void GPU::vertexShaderStage(
 
 	uint32_t index = 0;
 	for (uint32_t i = first; i < first + count; ++i) {
-		//»ñÈ¡EboÖĞµÚi¸öindex
+		//è·å–Eboä¸­ç¬¬iä¸ªindex
 		size_t indicesOffset = i * sizeof(uint32_t);
 		memcpy(&index, indicesData + indicesOffset, sizeof(uint32_t));
 
@@ -408,7 +408,7 @@ void GPU::screenMapping(VsOutput& vsOutput) {
 }
 
 void GPU::trim(VsOutput& vsOutput) {
-	//ĞŞ¼ôÃ«´Ì,±ß½çÇó½»µãµÄÊ±ºò£¬¿ÉÄÜ»á²úÉú³¬¹ı-1-1ÏÖÏó
+	//ä¿®å‰ªæ¯›åˆº,è¾¹ç•Œæ±‚äº¤ç‚¹çš„æ—¶å€™ï¼Œå¯èƒ½ä¼šäº§ç”Ÿè¶…è¿‡-1-1ç°è±¡
 	if (vsOutput.mPosition.x < -1.0f) {
 		vsOutput.mPosition.x = -1.0f;
 	}

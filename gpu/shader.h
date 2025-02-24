@@ -9,13 +9,13 @@ public:
 	Shader() {}
 	~Shader() {}
 	virtual VsOutput vertexShader(
-		//VAO当中的bindingMap
+		//VAO褰撲腑鐨刡indingMap
 		const std::map<uint32_t, BindingDescription>& bindingMap,
 
-		//VBO当中的bindingMap
+		//VBO褰撲腑鐨刡indingMap
 		const std::map<uint32_t,BufferObject*>& bufferMap,
 
-		//当前要处理的顶点的index
+		//褰撳墠瑕佸鐞嗙殑椤剁偣鐨刬ndex
 		const uint32_t& index
 	) = 0;
 
@@ -23,15 +23,15 @@ public:
 
 	//tool functions
 protected:
-	//你要先看在VertexShader函数中如何使用，再看逻辑
+	//浣犺鍏堢湅鍦╒ertexShader鍑芥暟涓浣曚娇鐢紝鍐嶇湅閫昏緫
 	math::vec4f getVector(
 		const std::map<uint32_t, BindingDescription>& bindingMap,
 		const std::map<uint32_t, BufferObject*>& bufferMap,
-		const uint32_t& attributeLocation,//当前属性的编号
-		const uint32_t& index);//当前顶点编号
+		const uint32_t& attributeLocation,//褰撳墠灞炴�х殑缂栧彿
+		const uint32_t& index);//褰撳墠椤剁偣缂栧彿
 
 	RGBA vectorToRGBA(const math::vec4f& v) {
-		//防止颜色越界
+		//闃叉棰滆壊瓒婄晫
 		math::vec4f c = v;
 		c.x = std::clamp(c.x, 0.0f, 1.0f);
 		c.y = std::clamp(c.y, 0.0f, 1.0f);

@@ -11,10 +11,10 @@ VsOutput LightShader::vertexShader(
 ) {
 	VsOutput output;
 
-	//È¡³öAttributeÊıÖµ
+	//å–å‡ºAttributeæ•°å€¼
 	math::vec4f position = getVector(bindingMap, bufferMap, 0, index);
 
-	//±ä»¯ÎªÆë´Î×ø±ê 
+	//å˜åŒ–ä¸ºé½æ¬¡åæ ‡ 
 	position.w = 1.0f;
 	//math::vec4f color = getVector(bindingMap, bufferMap, 1, index);
 
@@ -34,30 +34,30 @@ void LightShader::fragmentShader(const VsOutput& input, FsOutput& output, const 
 	output.mPixelPos.y = static_cast<int>(input.mPosition.y);
 	output.mDepth = input.mPosition.z;
 
-	//È¡³ö·¨Ïß
+	//å–å‡ºæ³•çº¿
 	auto normal = math::normalize(input.mNormal);
 	auto lightDirection = math::normalize(mDirectionalLight.direction);
 
-	//È¡³ötexture
+	//å–å‡ºtexture
 	auto iter = textures.find(mDiffuseTexture);
 	Texture* texture = nullptr;
 	if (iter != textures.end()) {
 		texture = iter->second;
 	}
 
-	//¼ÆËãÑÕÉ«
+	//è®¡ç®—é¢œè‰²
 	math::vec4f texColor = {1.0f, 1.0f, 1.0f, 1.0f};
 	if (texture) {
 		texColor = texture->getColor(input.mUV.x, input.mUV.y);
 	}
 
-	//¼ÆËãÂş·´Éä¹â
+	//è®¡ç®—æ¼«åå°„å…‰
 	math::vec4f  diffuseColor;
 	float diff = math::dot(normal, -lightDirection);
 	diff = std::clamp(diff, 0.0f, 1.0f);
 	diffuseColor = texColor * diff * math::vec4f(mDirectionalLight.color, 1.0f);
 
-	//¼ÆËã»·¾³¹â
+	//è®¡ç®—ç¯å¢ƒå…‰
 	math::vec4f  envColor; 
 	envColor = texColor * math::vec4f(mEnvLight, 1.0f);
 
