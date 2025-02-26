@@ -8,6 +8,7 @@
 #include "application/camera.h"
 #include "application/model.h"
 
+
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup" )
 
 uint32_t WIDTH = 1200;
