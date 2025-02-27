@@ -1,0 +1,11 @@
+Model Information:
+* title:	Rowhouses on 29th St. Baltimore
+* source:	https://sketchfab.com/3d-models/rowhouses-on-29th-st-baltimore-519a433264584a87b97700a608fefed2
+* author:	Taylor (https://sketchfab.com/thoulihan)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Rowhouses on 29th St. Baltimore" (https://sketchfab.com/3d-models/rowhouses-on-29th-st-baltimore-519a433264584a87b97700a608fefed2) by Taylor (https://sketchfab.com/thoulihan) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
