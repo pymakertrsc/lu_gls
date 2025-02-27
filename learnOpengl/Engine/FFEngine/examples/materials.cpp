@@ -49,30 +49,30 @@ int main() {
 	auto boxGeometry = ff::BoxGeometry::create(1.0, 1.0, 1.0);
 
 	auto meshBasicMaterial = ff::MeshBasicMaterial::create();
-	meshBasicMaterial->mDiffuseMap = ff::TextureLoader::load("assets/textures/cat.png");
+	meshBasicMaterial->mDiffuseMap = ff::TextureLoader::load("assets/textures/bing.png");
 	meshBasicCube = ff::Mesh::create(boxGeometry, meshBasicMaterial);
 	meshBasicCube->setPosition(-2.0, 0.0, 0.0);
 
-	//Óë¹âÕÕÓÐ·´Ó¦
+	//ä¸Žå…‰ç…§æœ‰ååº”
 	auto meshPhongMaterial = ff::MeshPhongMaterial::create();
 	meshPhongMaterial->mDiffuseMap = ff::TextureLoader::load("assets/textures/stars.jpg");
 	meshPhongCube = ff::Mesh::create(boxGeometry, meshPhongMaterial);
 	meshPhongCube->setPosition(0.0, 0.0, 0.0);
 
-	//ÓÃÀ´½«ÎïÌåµÄÃ¿¸öFragmentµÄÉî¶ÈÖµäÖÈ¾ÔÚÆÁÄ»ÉÏ
+	//ç”¨æ¥å°†ç‰©ä½“çš„æ¯ä¸ªFragmentçš„æ·±åº¦å€¼æ¸²æŸ“åœ¨å±å¹•ä¸Š
 	auto depthMaterial = ff::DepthMaterial::create();
 	meshDepthCube = ff::Mesh::create(boxGeometry, depthMaterial);
 	meshDepthCube->setPosition(0.0, 0.0, -2.0);
 
-	//ÓÃµÄ»¹ÊÇ»ù´¡²ÄÖÊ£¬Ö»²»¹ýÆôÓÃÁËÍ¸Ã÷¶È
+	//ç”¨çš„è¿˜æ˜¯åŸºç¡€æè´¨ï¼Œåªä¸è¿‡å¯ç”¨äº†é€æ˜Žåº¦
 	auto meshTransparentMaterial = ff::MeshBasicMaterial::create();
-	meshTransparentMaterial->mDiffuseMap = ff::TextureLoader::load("assets/textures/cat.png"); 
+	meshTransparentMaterial->mDiffuseMap = ff::TextureLoader::load("assets/textures/bing.jpg"); 
 	meshTransparentMaterial->mTransparent = true;
 	meshTransparentMaterial->mOpacity = 0.4;
 	meshTransparentCube = ff::Mesh::create(boxGeometry, meshTransparentMaterial);
 	meshTransparentCube->setPosition(1.0, 0.0, 1.0);
 
-	//´´½¨Æ½ÐÐ¹â
+	//åˆ›å»ºå¹³è¡Œå…‰
 	auto directionalLight = ff::DirectionalLight::create();
 	directionalLight->setPosition(4.0f, 0.0f, 4.0f);
 	directionalLight->mColor = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -85,13 +85,13 @@ int main() {
 	scene->addChild(meshDepthCube);
 	scene->addChild(meshTransparentCube);
 
-	//ÖØÒª£¬¹âÒ²ÊÇÒª¼ÓÈëµ½³¡¾°ÄÚ²¿µÄ
+	//é‡è¦ï¼Œå…‰ä¹Ÿæ˜¯è¦åŠ å…¥åˆ°åœºæ™¯å†…éƒ¨çš„
 	scene->addChild(directionalLight);
 
 	auto camera = ff::PerspectiveCamera::create(0.1f, 100.0f, (float)WIDTH / (float)(HEIGHT), 60.0f);
 	camera->setPosition(2.0f, 2.0f, 2.0f);
 
-	//upÊÇÖ¸´ó·½ÏòµÄÊÀ½çup£¬Ö»ÒªÄãÃ»µ¹Á¢¹ýÀ´£¬¾ÍÊÇ(0 , 1 , 0)
+	//upæ˜¯æŒ‡å¤§æ–¹å‘çš„ä¸–ç•Œupï¼Œåªè¦ä½ æ²¡å€’ç«‹è¿‡æ¥ï¼Œå°±æ˜¯(0 , 1 , 0)
 	camera->lookAt(glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 
 	ff::Renderer::Descriptor rDc;
