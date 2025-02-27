@@ -47,6 +47,9 @@ void rotateCube() {
 
 int main() {
 	auto boxGeometry = ff::BoxGeometry::create(1.0, 1.0, 1.0);
+	//--debug  材质方块大小控制
+	//auto boxGeometry = ff::BoxGeometry::create(2.0, 2.0, 2.0);
+	//auto boxGeometry = ff::BoxGeometry::create(1.0, 2.0, 2.0);
 
 	auto meshBasicMaterial = ff::MeshBasicMaterial::create();
 	meshBasicMaterial->mDiffuseMap = ff::TextureLoader::load("assets/textures/bing.png");
